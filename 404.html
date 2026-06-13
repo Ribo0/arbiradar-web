@@ -452,6 +452,226 @@
       white-space: nowrap;
     }
 
+    .surebet-tool {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .surebet-board,
+    .surebet-summary {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .surebet-board {
+      padding: 22px;
+    }
+
+    .surebet-summary {
+      position: sticky;
+      top: 18px;
+      padding: 22px;
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .tool-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .field label,
+    .mini-field label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field select,
+    .mini-field input,
+    .mini-field select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      font: inherit;
+      padding: 9px 10px;
+    }
+
+    .tool-switches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .switch-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f7fafc;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .switch-line input {
+      accent-color: var(--teal);
+    }
+
+    .odds-header,
+    .surebet-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 1.35fr) 0.7fr 0.72fr 0.72fr 0.82fr minmax(120px, 0.85fr);
+      gap: 10px;
+      align-items: end;
+    }
+
+    .odds-header {
+      padding: 10px 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .surebet-row {
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .surebet-row .stake-output {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-height: 42px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: #ecfff5;
+      color: #0f7a49;
+      font-weight: 900;
+      text-align: right;
+    }
+
+    .fixed-stake {
+      display: none;
+      margin-top: 8px;
+    }
+
+    .surebet-row.is-fixed .fixed-stake {
+      display: block;
+    }
+
+    .mini-field.is-disabled {
+      opacity: 0.48;
+    }
+
+    .mini-field.is-disabled input {
+      background: #eef2f7;
+    }
+
+    .tool-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary-metric {
+      padding: 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .summary-metric span {
+      display: block;
+      margin-bottom: 7px;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .summary-metric b {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .summary-metric.profit b {
+      color: #7ee2a8;
+    }
+
+    .surebet-status {
+      padding: 13px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 14px;
+      font-weight: 800;
+    }
+
+    .surebet-status.positive {
+      background: rgba(31, 122, 85, 0.22);
+      border-color: rgba(126, 226, 168, 0.40);
+      color: #dfffea;
+    }
+
+    .surebet-status.negative {
+      background: rgba(183, 66, 89, 0.18);
+      border-color: rgba(255, 174, 190, 0.34);
+      color: #ffe3e8;
+    }
+
+    .profit-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .profit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+    }
+
+    .profit-row strong {
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .profit-row.positive strong {
+      color: #7ee2a8;
+    }
+
+    .profit-row.negative strong {
+      color: #ffb6c4;
+    }
+
     .steps {
       display: grid;
       gap: 12px;
@@ -700,8 +920,26 @@
       .grid-three,
       .product-frame,
       .calculator,
+      .surebet-tool,
       .faq-list {
         grid-template-columns: 1fr;
+      }
+
+      .surebet-summary {
+        position: static;
+      }
+
+      .tool-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .odds-header {
+        display: none;
+      }
+
+      .surebet-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
       }
 
       .conversion-cta {
@@ -743,6 +981,22 @@
       .section-title h2 {
         font-size: 28px;
       }
+
+      .tool-controls,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .surebet-row {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        padding: 16px 0;
+      }
+
+      .surebet-row .stake-output {
+        justify-content: flex-start;
+        text-align: left;
+      }
     }
   </style>
 </head>
@@ -755,6 +1009,7 @@
       </a>
       <nav class="nav" aria-label="Navegacion principal">
         <a href="#como-funciona">Como funciona</a>
+        <a href="#calculadora">Calculadora</a>
         <a href="#simulador">Simulador</a>
         <a href="#planes">Planes</a>
         <a href="#faq">FAQ</a>
@@ -774,7 +1029,7 @@
           </p>
           <div class="hero-actions">
             <a class="button primary" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Abrir bot en Telegram</a>
-            <a class="button secondary" href="#simulador">Calcular escenario mensual</a>
+            <a class="button secondary" href="#calculadora">Probar calculadora</a>
           </div>
           <div class="hero-note">
             +18. Herramienta informativa. No realiza apuestas automaticas ni garantiza beneficios.
@@ -881,38 +1136,38 @@
                 </div>
                 <div class="alert-metric profit">
                   <span>Ganancia estimada</span>
-                  <b>+10.50 EUR</b>
+                  <b>+20.00 EUR</b>
                 </div>
                 <div class="alert-metric">
                   <span>ROI teorico</span>
-                  <b>5.2%</b>
+                  <b>10.0%</b>
                 </div>
                 <div class="alert-metric">
                   <span>Retorno estimado</span>
-                  <b>210.50 EUR</b>
+                  <b>220.00 EUR</b>
                 </div>
               </div>
               <div class="stake-list" aria-label="Reparto simulado de stakes">
                 <div class="stake-row">
                   <span>
                     <b>Real Madrid gana</b>
-                    <small>Casa A @ 2.60</small>
+                    <small>Casa A @ 3.00</small>
                   </span>
-                  <strong>80.96 EUR</strong>
+                  <strong>73.34 EUR</strong>
                 </div>
                 <div class="stake-row">
                   <span>
                     <b>Empate</b>
-                    <small>Casa B @ 3.85</small>
+                    <small>Casa B @ 4.00</small>
                   </span>
-                  <strong>54.68 EUR</strong>
+                  <strong>55.00 EUR</strong>
                 </div>
                 <div class="stake-row">
                   <span>
                     <b>FC Barcelona gana</b>
-                    <small>Casa C @ 3.27</small>
+                    <small>Casa C @ 3.07</small>
                   </span>
-                  <strong>64.36 EUR</strong>
+                  <strong>71.66 EUR</strong>
                 </div>
               </div>
             </div>
@@ -957,6 +1212,106 @@
               limitaciones que el plan gratuito.
             </p>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="calculadora">
+      <div class="shell">
+        <div class="section-title">
+          <div>
+            <h2>Calculadora de surebets</h2>
+            <p>
+              Introduce cuotas decimales, elige cuanto quieres invertir y calcula si existe
+              arbitraje teorico. La calculadora reparte el stake para equilibrar el retorno.
+            </p>
+          </div>
+        </div>
+        <div class="surebet-tool">
+          <div class="surebet-board">
+            <div class="tool-controls">
+              <div class="field">
+                <label for="outcomeCount">Resultados</label>
+                <select id="outcomeCount">
+                  <option value="2">2 resultados</option>
+                  <option value="3" selected>3 resultados</option>
+                  <option value="4">4 resultados</option>
+                  <option value="5">5 resultados</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="surebetBudget">Apuesta total</label>
+                <input id="surebetBudget" type="number" min="1" step="1" value="200">
+              </div>
+              <div class="field">
+                <label for="surebetCurrency">Divisa</label>
+                <select id="surebetCurrency">
+                  <option value="EUR" selected>EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="stakeRounding">Redondeo</label>
+                <select id="stakeRounding">
+                  <option value="0.01" selected>0.01</option>
+                  <option value="0.1">0.10</option>
+                  <option value="1">1</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-switches">
+              <label class="switch-line" for="useCommissions">
+                <input id="useCommissions" type="checkbox">
+                Comisiones por casa
+              </label>
+              <label class="switch-line" for="useExchangeRates">
+                <input id="useExchangeRates" type="checkbox">
+                Tipos de cambio
+              </label>
+            </div>
+            <div class="odds-header" aria-hidden="true">
+              <span>Resultado</span>
+              <span>Cuota</span>
+              <span>Modo</span>
+              <span data-column="commission">Comision</span>
+              <span data-column="exchange">Cambio</span>
+              <span>Stake recomendado</span>
+            </div>
+            <div id="surebetRows"></div>
+            <p class="tool-note">
+              Usa modo "Distribuir" para repartir automaticamente el stake. Usa "Fija" si quieres bloquear
+              una apuesta concreta y repartir el resto entre los demas resultados.
+            </p>
+          </div>
+          <aside class="surebet-summary" aria-label="Resultado de la calculadora de surebets">
+            <div class="summary-grid">
+              <div class="summary-metric">
+                <span>Apuesta real</span>
+                <b id="actualStakeResult">200.00 EUR</b>
+              </div>
+              <div class="summary-metric">
+                <span>Suma inversa</span>
+                <b id="inverseSumResult">90.91%</b>
+              </div>
+              <div class="summary-metric profit">
+                <span>Beneficio minimo</span>
+                <b id="minimumProfitResult">20.00 EUR</b>
+              </div>
+              <div class="summary-metric profit">
+                <span>ROI teorico</span>
+                <b id="surebetRoiResult">10.0%</b>
+              </div>
+            </div>
+            <div id="surebetStatus" class="surebet-status positive">
+              Surebet teorica detectada con margen positivo.
+            </div>
+            <div>
+              <strong>Beneficio si gana cada resultado</strong>
+              <div id="profitRows" class="profit-list"></div>
+            </div>
+          </aside>
         </div>
       </div>
     </section>
@@ -1162,7 +1517,7 @@
 
   <script>
     const ops = document.getElementById("ops");
-    const stake = document.getElementById("stake");
+    const monthlyStake = document.getElementById("stake");
     const roi = document.getElementById("roi");
     const maxRoi = document.getElementById("maxRoi");
     const opsValue = document.getElementById("opsValue");
@@ -1174,7 +1529,7 @@
 
     function updateCalculator() {
       const opsNumber = Number(ops.value);
-      const stakeNumber = Number(stake.value);
+      const stakeNumber = Number(monthlyStake.value);
       const roiNumber = Number(roi.value);
       const maxRoiNumber = Number(maxRoi.value);
       const monthly = Math.round(opsNumber * stakeNumber * (roiNumber / 100));
@@ -1188,10 +1543,235 @@
       maxMonthlyResult.textContent = `${maxMonthly} EUR`;
     }
 
-    [ops, stake, roi, maxRoi].forEach((control) => {
+    [ops, monthlyStake, roi, maxRoi].forEach((control) => {
       control.addEventListener("input", updateCalculator);
     });
     updateCalculator();
+
+    const outcomeCount = document.getElementById("outcomeCount");
+    const surebetBudget = document.getElementById("surebetBudget");
+    const surebetCurrency = document.getElementById("surebetCurrency");
+    const stakeRounding = document.getElementById("stakeRounding");
+    const useCommissions = document.getElementById("useCommissions");
+    const useExchangeRates = document.getElementById("useExchangeRates");
+    const surebetRows = document.getElementById("surebetRows");
+    const actualStakeResult = document.getElementById("actualStakeResult");
+    const inverseSumResult = document.getElementById("inverseSumResult");
+    const minimumProfitResult = document.getElementById("minimumProfitResult");
+    const surebetRoiResult = document.getElementById("surebetRoiResult");
+    const surebetStatus = document.getElementById("surebetStatus");
+    const profitRows = document.getElementById("profitRows");
+
+    const surebetDefaults = [
+      { label: "Real Madrid gana", odd: 3.00, mode: "D", fixed: "", commission: 0, rate: 1 },
+      { label: "Empate", odd: 4.00, mode: "D", fixed: "", commission: 0, rate: 1 },
+      { label: "FC Barcelona gana", odd: 3.07, mode: "D", fixed: "", commission: 0, rate: 1 },
+      { label: "Resultado 4", odd: 6.50, mode: "D", fixed: "", commission: 0, rate: 1 },
+      { label: "Resultado 5", odd: 8.00, mode: "D", fixed: "", commission: 0, rate: 1 },
+    ];
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      }[character]));
+    }
+
+    function numberFrom(value, fallback = 0) {
+      const parsed = Number(String(value).replace(",", "."));
+      return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function formatMoney(value, currency) {
+      return `${value.toLocaleString("es-ES", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })} ${currency}`;
+    }
+
+    function formatPercent(value, digits = 1) {
+      return `${value.toLocaleString("es-ES", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+      })}%`;
+    }
+
+    function readSurebetRows() {
+      return [...surebetRows.querySelectorAll(".surebet-row")].map((row) => ({
+        label: row.querySelector(".outcome-input").value || "Resultado",
+        odd: numberFrom(row.querySelector(".odd-input").value, 2),
+        mode: row.querySelector(".mode-input").value,
+        fixed: row.querySelector(".fixed-input").value,
+        commission: numberFrom(row.querySelector(".commission-input").value, 0),
+        rate: numberFrom(row.querySelector(".rate-input").value, 1),
+      }));
+    }
+
+    function renderSurebetRows() {
+      const count = numberFrom(outcomeCount.value, 3);
+      const previousRows = readSurebetRows();
+      const rows = Array.from({ length: count }, (_, index) => ({
+        ...surebetDefaults[index],
+        ...(previousRows[index] || {}),
+      }));
+
+      surebetRows.innerHTML = rows.map((row, index) => `
+        <div class="surebet-row" data-index="${index}">
+          <div class="mini-field">
+            <label for="outcome-${index}">Resultado ${index + 1}</label>
+            <input id="outcome-${index}" class="outcome-input" type="text" value="${escapeHtml(row.label)}">
+          </div>
+          <div class="mini-field">
+            <label for="odd-${index}">Cuota</label>
+            <input id="odd-${index}" class="odd-input" type="number" min="1.01" step="0.01" value="${row.odd}">
+          </div>
+          <div class="mini-field">
+            <label for="mode-${index}">Modo</label>
+            <select id="mode-${index}" class="mode-input">
+              <option value="D" ${row.mode === "D" ? "selected" : ""}>Distribuir</option>
+              <option value="F" ${row.mode === "F" ? "selected" : ""}>Fija</option>
+            </select>
+            <input class="fixed-input fixed-stake" type="number" min="0" step="0.01" value="${escapeHtml(row.fixed)}" placeholder="Stake fijo">
+          </div>
+          <div class="mini-field" data-advanced="commission">
+            <label for="commission-${index}">Comision %</label>
+            <input id="commission-${index}" class="commission-input" type="number" min="0" max="99" step="0.1" value="${row.commission}">
+          </div>
+          <div class="mini-field" data-advanced="exchange">
+            <label for="rate-${index}">Cambio</label>
+            <input id="rate-${index}" class="rate-input" type="number" min="0.0001" step="0.0001" value="${row.rate}">
+          </div>
+          <div class="stake-output" data-stake-output>0.00 EUR</div>
+        </div>
+      `).join("");
+
+      updateAdvancedFields();
+      updateFixedFields();
+      updateSurebetCalculator();
+    }
+
+    function updateFixedFields() {
+      surebetRows.querySelectorAll(".surebet-row").forEach((row) => {
+        const isFixed = row.querySelector(".mode-input").value === "F";
+        row.classList.toggle("is-fixed", isFixed);
+      });
+    }
+
+    function updateAdvancedFields() {
+      const commissionsOn = useCommissions.checked;
+      const exchangeOn = useExchangeRates.checked;
+      surebetRows.querySelectorAll('[data-advanced="commission"]').forEach((field) => {
+        field.classList.toggle("is-disabled", !commissionsOn);
+        field.querySelector("input").disabled = !commissionsOn;
+      });
+      surebetRows.querySelectorAll('[data-advanced="exchange"]').forEach((field) => {
+        field.classList.toggle("is-disabled", !exchangeOn);
+        field.querySelector("input").disabled = !exchangeOn;
+      });
+    }
+
+    function effectiveOdd(odd, commission) {
+      const safeOdd = Math.max(1.01, odd);
+      const safeCommission = Math.min(Math.max(commission, 0), 99);
+      return 1 + ((safeOdd - 1) * (1 - (safeCommission / 100)));
+    }
+
+    function roundTo(value, increment) {
+      const safeIncrement = Math.max(increment, 0.01);
+      return Math.round(value / safeIncrement) * safeIncrement;
+    }
+
+    function updateSurebetCalculator() {
+      const currency = surebetCurrency.value;
+      const targetBudget = Math.max(1, numberFrom(surebetBudget.value, 200));
+      const rounding = Math.max(0.01, numberFrom(stakeRounding.value, 0.01));
+      const rows = readSurebetRows().map((row, index) => {
+        const commission = useCommissions.checked ? row.commission : 0;
+        const rate = useExchangeRates.checked ? Math.max(row.rate, 0.0001) : 1;
+        return {
+          ...row,
+          index,
+          rate,
+          effectiveOdd: effectiveOdd(row.odd, commission),
+          fixedStake: Math.max(0, numberFrom(row.fixed, 0)),
+        };
+      });
+
+      const fixedRows = rows.filter((row) => row.mode === "F");
+      const distributedRows = rows.filter((row) => row.mode !== "F");
+      const fixedTotal = fixedRows.reduce((total, row) => total + row.fixedStake, 0);
+      const remainingBudget = Math.max(0, targetBudget - fixedTotal);
+      const distributedInverseSum = distributedRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
+      const targetReturn = distributedInverseSum > 0 ? remainingBudget / distributedInverseSum : 0;
+
+      const calculatedRows = rows.map((row) => {
+        const rawStake = row.mode === "F" ? row.fixedStake : targetReturn / row.effectiveOdd;
+        const stake = roundTo(rawStake, rounding);
+        return {
+          ...row,
+          stake,
+          payout: stake * row.effectiveOdd,
+        };
+      });
+
+      const actualStake = calculatedRows.reduce((total, row) => total + row.stake, 0);
+      const profits = calculatedRows.map((row) => row.payout - actualStake);
+      const minimumProfit = profits.length ? Math.min(...profits) : 0;
+      const roiValueNumber = actualStake > 0 ? (minimumProfit / actualStake) * 100 : 0;
+      const inverseSum = calculatedRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0) * 100;
+
+      calculatedRows.forEach((row) => {
+        const rowElement = surebetRows.querySelector(`[data-index="${row.index}"]`);
+        const stakeOutput = rowElement.querySelector("[data-stake-output]");
+        const localStake = row.stake * row.rate;
+        stakeOutput.textContent = useExchangeRates.checked && row.rate !== 1
+          ? `${formatMoney(localStake, currency)} local`
+          : formatMoney(row.stake, currency);
+      });
+
+      actualStakeResult.textContent = formatMoney(actualStake, currency);
+      inverseSumResult.textContent = formatPercent(inverseSum, 2);
+      minimumProfitResult.textContent = `${minimumProfit >= 0 ? "+" : ""}${formatMoney(minimumProfit, currency)}`;
+      surebetRoiResult.textContent = formatPercent(roiValueNumber, 1);
+
+      const isPositive = minimumProfit > 0;
+      surebetStatus.classList.toggle("positive", isPositive);
+      surebetStatus.classList.toggle("negative", !isPositive);
+      surebetStatus.textContent = isPositive
+        ? "Surebet teorica detectada con margen positivo."
+        : "No hay surebet con estos datos. Ajusta cuotas, stake o comisiones.";
+
+      profitRows.innerHTML = calculatedRows.map((row, index) => {
+        const profit = profits[index] || 0;
+        return `
+          <div class="profit-row ${profit >= 0 ? "positive" : "negative"}">
+            <span>${escapeHtml(row.label)}</span>
+            <strong>${profit >= 0 ? "+" : ""}${formatMoney(profit, currency)}</strong>
+          </div>
+        `;
+      }).join("");
+    }
+
+    outcomeCount.addEventListener("change", renderSurebetRows);
+    [surebetBudget, surebetCurrency, stakeRounding, useCommissions, useExchangeRates].forEach((control) => {
+      control.addEventListener("input", () => {
+        updateAdvancedFields();
+        updateSurebetCalculator();
+      });
+      control.addEventListener("change", () => {
+        updateAdvancedFields();
+        updateSurebetCalculator();
+      });
+    });
+    surebetRows.addEventListener("input", updateSurebetCalculator);
+    surebetRows.addEventListener("change", () => {
+      updateFixedFields();
+      updateSurebetCalculator();
+    });
+    renderSurebetRows();
   </script>
 </body>
 </html>
