@@ -522,8 +522,8 @@
       <span class="kicker">Herramienta avanzada</span>
       <h1>Calculadora de surebets</h1>
       <p>
-        Prueba cuotas decimales, fija una apuesta si ya la tienes decidida y distribuye
-        el resto del stake entre los resultados que quieras cubrir.
+        Prueba cuotas decimales, fija una apuesta si ya la tienes decidida y calcula
+        automaticamente cuanto poner en los demas resultados para equilibrar el retorno.
       </p>
       <div class="hero-actions">
         <a class="button primary" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Abrir bot en Telegram</a>
@@ -591,8 +591,8 @@
           </div>
           <div id="surebetRows"></div>
           <p class="tool-note">
-            Solo puede haber una apuesta fija activa. Si marcas una fija, la anterior se desmarca automaticamente.
-            Los checkboxes de distribuir son independientes: puedes cubrir todos los resultados, solo algunos o ninguno.
+            Sin apuesta fija, la calculadora reparte la apuesta total. Con una fija activa,
+            esa cantidad define el retorno objetivo y las demas apuestas se adaptan automaticamente.
           </p>
         </div>
 
@@ -628,11 +628,11 @@
       <div class="info-grid">
         <article class="info-panel">
           <h3>Fija</h3>
-          <p>Bloquea una unica apuesta si ya sabes cuanto quieres poner en una casa concreta.</p>
+          <p>Bloquea una unica apuesta; las demas marcadas como distribuir se recalculan para igualar su retorno.</p>
         </article>
         <article class="info-panel">
           <h3>Distribuir</h3>
-          <p>Marca los resultados donde quieres que la calculadora reparta automaticamente el stake restante.</p>
+          <p>Marca los resultados que quieres cubrir automaticamente. Puedes activarlos o desactivarlos por separado.</p>
         </article>
         <article class="info-panel">
           <h3>Lectura del ROI</h3>
@@ -832,10 +832,13 @@
 
       const fixedRows = rows.filter((row) => row.fixed);
       const distributedRows = rows.filter((row) => !row.fixed && row.distribute);
-      const fixedTotal = fixedRows.reduce((total, row) => total + row.fixedStake, 0);
-      const remainingBudget = Math.max(0, targetBudget - fixedTotal);
+      const fixedRow = fixedRows[0] || null;
       const distributedInverseSum = distributedRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
-      const targetReturn = distributedInverseSum > 0 ? remainingBudget / distributedInverseSum : 0;
+      const targetReturn = fixedRow
+        ? fixedRow.fixedStake * fixedRow.effectiveOdd
+        : distributedInverseSum > 0
+          ? targetBudget / distributedInverseSum
+          : 0;
 
       const calculatedRows = rows.map((row) => {
         const rawStake = row.fixed
@@ -873,14 +876,16 @@
       surebetRoiResult.textContent = formatPercent(roiValueNumber, 1);
 
       const uncoveredRows = calculatedRows.filter((row) => row.stake <= 0);
-      const fixedOverBudget = fixedTotal > targetBudget;
-      const isPositive = minimumProfit > 0 && uncoveredRows.length === 0 && !fixedOverBudget;
+      const fixedWithoutStake = Boolean(fixedRow && fixedRow.fixedStake <= 0);
+      const isPositive = minimumProfit > 0 && uncoveredRows.length === 0 && !fixedWithoutStake;
       surebetStatus.classList.toggle("positive", isPositive);
       surebetStatus.classList.toggle("negative", !isPositive);
       surebetStatus.textContent = isPositive
-        ? "Surebet teorica detectada con margen positivo."
-        : fixedOverBudget
-          ? "La apuesta fija supera el presupuesto total. Ajusta el stake fijo o el presupuesto."
+        ? fixedRow
+          ? "Stake fijo aplicado: el resto de apuestas se ha ajustado al mismo retorno teorico."
+          : "Surebet teorica detectada con margen positivo."
+        : fixedWithoutStake
+          ? "Introduce una cantidad en la apuesta fija para adaptar el resto de resultados."
           : uncoveredRows.length
             ? "Hay resultados sin cubrir. Marca distribuir o fija un stake para todos los resultados necesarios."
             : "No hay surebet con estos datos. Ajusta cuotas, stake o comisiones.";
