@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArbiRadar | Calculadora de surebets</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #111827;
+      --muted: #5d6677;
+      --paper: #ffffff;
+      --line: #d9e0ea;
+      --teal: #127a7d;
+      --green: #1f7a55;
+      --rose: #b74259;
+      --dark: #0f172a;
+      --soft: #f5f7fb;
+      --shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #f7f9fc;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.48;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 18px 0;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 19px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .nav a {
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .tool-hero {
+      padding: 56px 0 28px;
+      background:
+        linear-gradient(90deg, rgba(15, 23, 42, 0.96), rgba(18, 122, 125, 0.82)),
+        url("https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1800&q=80") center/cover;
+      color: #ffffff;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 8px 11px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 76px);
+      line-height: 0.98;
+      max-width: 820px;
+    }
+
+    .tool-hero p {
+      max-width: 680px;
+      margin-top: 18px;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 19px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .button.primary {
+      background: #ffffff;
+      color: var(--dark);
+    }
+
+    .button.secondary {
+      border-color: rgba(255, 255, 255, 0.42);
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+    }
+
+    .button.dark {
+      background: var(--dark);
+      color: #ffffff;
+    }
+
+    main {
+      padding: 28px 0 72px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.24fr) minmax(320px, 0.76fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .board,
+    .summary,
+    .info-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .board {
+      padding: 22px;
+    }
+
+    .summary {
+      position: sticky;
+      top: 18px;
+      padding: 22px;
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .tool-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .field label,
+    .mini-field label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field select,
+    .mini-field input,
+    .mini-field select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      font: inherit;
+      padding: 9px 10px;
+    }
+
+    .tool-switches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .switch-line,
+    .check-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f7fafc;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .switch-line input,
+    .check-cell input {
+      accent-color: var(--teal);
+    }
+
+    .odds-header,
+    .surebet-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 1.2fr) 0.58fr 0.52fr 0.68fr 0.72fr 0.72fr 0.82fr minmax(120px, 0.9fr);
+      gap: 10px;
+      align-items: end;
+    }
+
+    .odds-header {
+      padding: 10px 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .surebet-row {
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .surebet-row .stake-output {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-height: 42px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: #ecfff5;
+      color: #0f7a49;
+      font-weight: 900;
+      text-align: right;
+    }
+
+    .fixed-stake {
+      opacity: 0.48;
+    }
+
+    .surebet-row.is-fixed .fixed-stake {
+      opacity: 1;
+    }
+
+    .mini-field.is-disabled {
+      opacity: 0.48;
+    }
+
+    .mini-field.is-disabled input {
+      background: #eef2f7;
+    }
+
+    .tool-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary-metric {
+      padding: 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .summary-metric span {
+      display: block;
+      margin-bottom: 7px;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .summary-metric b {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .summary-metric.profit b {
+      color: #7ee2a8;
+    }
+
+    .surebet-status {
+      padding: 13px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 14px;
+      font-weight: 800;
+    }
+
+    .surebet-status.positive {
+      background: rgba(31, 122, 85, 0.22);
+      border-color: rgba(126, 226, 168, 0.40);
+      color: #dfffea;
+    }
+
+    .surebet-status.negative {
+      background: rgba(183, 66, 89, 0.18);
+      border-color: rgba(255, 174, 190, 0.34);
+      color: #ffe3e8;
+    }
+
+    .profit-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .profit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+    }
+
+    .profit-row strong {
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .profit-row.positive strong {
+      color: #7ee2a8;
+    }
+
+    .profit-row.negative strong {
+      color: #ffb6c4;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .info-panel {
+      padding: 20px;
+      box-shadow: none;
+    }
+
+    .info-panel h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .info-panel p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer {
+      padding: 24px 0;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: #ffffff;
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1020px) {
+      .tool-layout,
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        position: static;
+      }
+
+      .tool-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .odds-header {
+        display: none;
+      }
+
+      .surebet-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .tool-controls,
+      .summary-grid,
+      .surebet-row {
+        grid-template-columns: 1fr;
+      }
+
+      .surebet-row .stake-output {
+        justify-content: flex-start;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="index.html" aria-label="ArbiRadar inicio">
+        <span class="brand-mark">AR</span>
+        <span>ArbiRadar</span>
+      </a>
+      <nav class="nav" aria-label="Navegacion principal">
+        <a href="index.html">Landing</a>
+        <a href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Bot Telegram</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="tool-hero">
+    <div class="shell">
+      <span class="kicker">Herramienta avanzada</span>
+      <h1>Calculadora de surebets</h1>
+      <p>
+        Prueba cuotas decimales, fija una apuesta si ya la tienes decidida y distribuye
+        el resto del stake entre los resultados que quieras cubrir.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Abrir bot en Telegram</a>
+        <a class="button secondary" href="index.html">Volver a la landing</a>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="shell">
+      <div class="tool-layout">
+        <div class="board">
+          <div class="tool-controls">
+            <div class="field">
+              <label for="outcomeCount">Resultados</label>
+              <select id="outcomeCount">
+                <option value="2">2 resultados</option>
+                <option value="3" selected>3 resultados</option>
+                <option value="4">4 resultados</option>
+                <option value="5">5 resultados</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="surebetBudget">Apuesta total</label>
+              <input id="surebetBudget" type="number" min="1" step="1" value="200">
+            </div>
+            <div class="field">
+              <label for="surebetCurrency">Divisa</label>
+              <select id="surebetCurrency">
+                <option value="EUR" selected>EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="stakeRounding">Redondeo</label>
+              <select id="stakeRounding">
+                <option value="0.01" selected>0.01</option>
+                <option value="0.1">0.10</option>
+                <option value="1">1</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+          <div class="tool-switches">
+            <label class="switch-line" for="useCommissions">
+              <input id="useCommissions" type="checkbox">
+              Comisiones por casa
+            </label>
+            <label class="switch-line" for="useExchangeRates">
+              <input id="useExchangeRates" type="checkbox">
+              Tipos de cambio
+            </label>
+            <button id="resetCalculator" class="button dark" type="button">Restablecer ejemplo</button>
+          </div>
+          <div class="odds-header" aria-hidden="true">
+            <span>Resultado</span>
+            <span>Cuota</span>
+            <span>Fija</span>
+            <span>Distribuir</span>
+            <span>Stake fijo</span>
+            <span>Comision</span>
+            <span>Cambio</span>
+            <span>Stake recomendado</span>
+          </div>
+          <div id="surebetRows"></div>
+          <p class="tool-note">
+            Solo puede haber una apuesta fija activa. Si marcas una fija, la anterior se desmarca automaticamente.
+            Los checkboxes de distribuir son independientes: puedes cubrir todos los resultados, solo algunos o ninguno.
+          </p>
+        </div>
+
+        <aside class="summary" aria-label="Resultado de la calculadora de surebets">
+          <div class="summary-grid">
+            <div class="summary-metric">
+              <span>Apuesta real</span>
+              <b id="actualStakeResult">200.00 EUR</b>
+            </div>
+            <div class="summary-metric">
+              <span>Suma inversa</span>
+              <b id="inverseSumResult">90.91%</b>
+            </div>
+            <div class="summary-metric profit">
+              <span>Beneficio minimo</span>
+              <b id="minimumProfitResult">+20.00 EUR</b>
+            </div>
+            <div class="summary-metric profit">
+              <span>ROI teorico</span>
+              <b id="surebetRoiResult">10.0%</b>
+            </div>
+          </div>
+          <div id="surebetStatus" class="surebet-status positive">
+            Surebet teorica detectada con margen positivo.
+          </div>
+          <div>
+            <strong>Beneficio si gana cada resultado</strong>
+            <div id="profitRows" class="profit-list"></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="info-grid">
+        <article class="info-panel">
+          <h3>Fija</h3>
+          <p>Bloquea una unica apuesta si ya sabes cuanto quieres poner en una casa concreta.</p>
+        </article>
+        <article class="info-panel">
+          <h3>Distribuir</h3>
+          <p>Marca los resultados donde quieres que la calculadora reparta automaticamente el stake restante.</p>
+        </article>
+        <article class="info-panel">
+          <h3>Lectura del ROI</h3>
+          <p>El ROI se calcula sobre el peor beneficio posible. Si alguna cuota cambia, el calculo deja de valer.</p>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <span>ArbiRadar. Herramienta informativa de analisis de cuotas.</span>
+      <span>+18. Juega con responsabilidad. Sin apuestas automaticas ni garantia de beneficio.</span>
+    </div>
+  </footer>
+
+  <script>
+    const outcomeCount = document.getElementById("outcomeCount");
+    const surebetBudget = document.getElementById("surebetBudget");
+    const surebetCurrency = document.getElementById("surebetCurrency");
+    const stakeRounding = document.getElementById("stakeRounding");
+    const useCommissions = document.getElementById("useCommissions");
+    const useExchangeRates = document.getElementById("useExchangeRates");
+    const resetCalculator = document.getElementById("resetCalculator");
+    const surebetRows = document.getElementById("surebetRows");
+    const actualStakeResult = document.getElementById("actualStakeResult");
+    const inverseSumResult = document.getElementById("inverseSumResult");
+    const minimumProfitResult = document.getElementById("minimumProfitResult");
+    const surebetRoiResult = document.getElementById("surebetRoiResult");
+    const surebetStatus = document.getElementById("surebetStatus");
+    const profitRows = document.getElementById("profitRows");
+
+    const defaultRows = [
+      { label: "Real Madrid gana", odd: 3.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "FC Barcelona gana", odd: 3.07, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+    ];
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      }[character]));
+    }
+
+    function numberFrom(value, fallback = 0) {
+      const parsed = Number(String(value).replace(",", "."));
+      return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function formatMoney(value, currency) {
+      return `${value.toLocaleString("es-ES", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })} ${currency}`;
+    }
+
+    function formatPercent(value, digits = 1) {
+      return `${value.toLocaleString("es-ES", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+      })}%`;
+    }
+
+    function readRows() {
+      return [...surebetRows.querySelectorAll(".surebet-row")].map((row) => ({
+        label: row.querySelector(".outcome-input").value || "Resultado",
+        odd: numberFrom(row.querySelector(".odd-input").value, 2),
+        fixed: row.querySelector(".fixed-check").checked,
+        distribute: row.querySelector(".distribute-check").checked,
+        fixedStake: row.querySelector(".fixed-amount-input").value,
+        commission: numberFrom(row.querySelector(".commission-input").value, 0),
+        rate: numberFrom(row.querySelector(".rate-input").value, 1),
+      }));
+    }
+
+    function renderRows(rows = null) {
+      const count = numberFrom(outcomeCount.value, 3);
+      const previousRows = rows || readRows();
+      const activeRows = Array.from({ length: count }, (_, index) => ({
+        ...defaultRows[index],
+        ...(previousRows[index] || {}),
+      }));
+
+      surebetRows.innerHTML = activeRows.map((row, index) => `
+        <div class="surebet-row" data-index="${index}">
+          <div class="mini-field">
+            <label for="outcome-${index}">Resultado ${index + 1}</label>
+            <input id="outcome-${index}" class="outcome-input" type="text" value="${escapeHtml(row.label)}">
+          </div>
+          <div class="mini-field">
+            <label for="odd-${index}">Cuota</label>
+            <input id="odd-${index}" class="odd-input" type="number" min="1.01" step="0.01" value="${row.odd}">
+          </div>
+          <label class="check-cell" for="fixed-${index}">
+            <input id="fixed-${index}" class="fixed-check" type="checkbox" ${row.fixed ? "checked" : ""}>
+            Fija
+          </label>
+          <label class="check-cell" for="distribute-${index}">
+            <input id="distribute-${index}" class="distribute-check" type="checkbox" ${row.distribute && !row.fixed ? "checked" : ""}>
+            Distribuir
+          </label>
+          <div class="mini-field fixed-stake">
+            <label for="fixed-amount-${index}">Stake fijo</label>
+            <input id="fixed-amount-${index}" class="fixed-amount-input" type="number" min="0" step="0.01" value="${escapeHtml(row.fixedStake)}" placeholder="0.00">
+          </div>
+          <div class="mini-field" data-advanced="commission">
+            <label for="commission-${index}">Comision %</label>
+            <input id="commission-${index}" class="commission-input" type="number" min="0" max="99" step="0.1" value="${row.commission}">
+          </div>
+          <div class="mini-field" data-advanced="exchange">
+            <label for="rate-${index}">Cambio</label>
+            <input id="rate-${index}" class="rate-input" type="number" min="0.0001" step="0.0001" value="${row.rate}">
+          </div>
+          <div class="stake-output" data-stake-output>0.00 EUR</div>
+        </div>
+      `).join("");
+
+      normalizeFixedRows();
+      updateAdvancedFields();
+      updateSurebetCalculator();
+    }
+
+    function normalizeFixedRows(changedCheckbox = null) {
+      const rows = [...surebetRows.querySelectorAll(".surebet-row")];
+      if (changedCheckbox && changedCheckbox.checked) {
+        rows.forEach((row) => {
+          const fixedCheck = row.querySelector(".fixed-check");
+          if (fixedCheck !== changedCheckbox) {
+            fixedCheck.checked = false;
+            row.querySelector(".distribute-check").disabled = false;
+          }
+        });
+      }
+
+      rows.forEach((row) => {
+        const fixedCheck = row.querySelector(".fixed-check");
+        const distributeCheck = row.querySelector(".distribute-check");
+        const fixedAmount = row.querySelector(".fixed-amount-input");
+        const fixedActive = fixedCheck.checked;
+        row.classList.toggle("is-fixed", fixedActive);
+        fixedAmount.disabled = !fixedActive;
+        distributeCheck.disabled = fixedActive;
+        if (fixedActive) {
+          distributeCheck.checked = false;
+          if (!fixedAmount.value) {
+            fixedAmount.value = row.querySelector("[data-stake-output]").textContent.replace(/[^0-9,.]/g, "").replace(",", ".");
+          }
+        }
+      });
+    }
+
+    function updateAdvancedFields() {
+      const commissionsOn = useCommissions.checked;
+      const exchangeOn = useExchangeRates.checked;
+      surebetRows.querySelectorAll('[data-advanced="commission"]').forEach((field) => {
+        field.classList.toggle("is-disabled", !commissionsOn);
+        field.querySelector("input").disabled = !commissionsOn;
+      });
+      surebetRows.querySelectorAll('[data-advanced="exchange"]').forEach((field) => {
+        field.classList.toggle("is-disabled", !exchangeOn);
+        field.querySelector("input").disabled = !exchangeOn;
+      });
+    }
+
+    function effectiveOdd(odd, commission) {
+      const safeOdd = Math.max(1.01, odd);
+      const safeCommission = Math.min(Math.max(commission, 0), 99);
+      return 1 + ((safeOdd - 1) * (1 - (safeCommission / 100)));
+    }
+
+    function roundTo(value, increment) {
+      const safeIncrement = Math.max(increment, 0.01);
+      return Math.round(value / safeIncrement) * safeIncrement;
+    }
+
+    function updateSurebetCalculator() {
+      const currency = surebetCurrency.value;
+      const targetBudget = Math.max(1, numberFrom(surebetBudget.value, 200));
+      const rounding = Math.max(0.01, numberFrom(stakeRounding.value, 0.01));
+      const rows = readRows().map((row, index) => {
+        const commission = useCommissions.checked ? row.commission : 0;
+        const rate = useExchangeRates.checked ? Math.max(row.rate, 0.0001) : 1;
+        return {
+          ...row,
+          index,
+          rate,
+          effectiveOdd: effectiveOdd(row.odd, commission),
+          fixedStake: Math.max(0, numberFrom(row.fixedStake, 0)),
+        };
+      });
+
+      const fixedRows = rows.filter((row) => row.fixed);
+      const distributedRows = rows.filter((row) => !row.fixed && row.distribute);
+      const fixedTotal = fixedRows.reduce((total, row) => total + row.fixedStake, 0);
+      const remainingBudget = Math.max(0, targetBudget - fixedTotal);
+      const distributedInverseSum = distributedRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
+      const targetReturn = distributedInverseSum > 0 ? remainingBudget / distributedInverseSum : 0;
+
+      const calculatedRows = rows.map((row) => {
+        const rawStake = row.fixed
+          ? row.fixedStake
+          : row.distribute
+            ? targetReturn / row.effectiveOdd
+            : 0;
+        const stake = roundTo(rawStake, rounding);
+        return {
+          ...row,
+          stake,
+          payout: stake * row.effectiveOdd,
+        };
+      });
+
+      const actualStake = calculatedRows.reduce((total, row) => total + row.stake, 0);
+      const profits = calculatedRows.map((row) => row.payout - actualStake);
+      const minimumProfit = profits.length ? Math.min(...profits) : 0;
+      const roiValueNumber = actualStake > 0 ? (minimumProfit / actualStake) * 100 : 0;
+      const coveredRows = calculatedRows.filter((row) => row.stake > 0);
+      const inverseSum = coveredRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0) * 100;
+
+      calculatedRows.forEach((row) => {
+        const rowElement = surebetRows.querySelector(`[data-index="${row.index}"]`);
+        const stakeOutput = rowElement.querySelector("[data-stake-output]");
+        const localStake = row.stake * row.rate;
+        stakeOutput.textContent = useExchangeRates.checked && row.rate !== 1
+          ? `${formatMoney(localStake, currency)} local`
+          : formatMoney(row.stake, currency);
+      });
+
+      actualStakeResult.textContent = formatMoney(actualStake, currency);
+      inverseSumResult.textContent = formatPercent(inverseSum, 2);
+      minimumProfitResult.textContent = `${minimumProfit >= 0 ? "+" : ""}${formatMoney(minimumProfit, currency)}`;
+      surebetRoiResult.textContent = formatPercent(roiValueNumber, 1);
+
+      const uncoveredRows = calculatedRows.filter((row) => row.stake <= 0);
+      const fixedOverBudget = fixedTotal > targetBudget;
+      const isPositive = minimumProfit > 0 && uncoveredRows.length === 0 && !fixedOverBudget;
+      surebetStatus.classList.toggle("positive", isPositive);
+      surebetStatus.classList.toggle("negative", !isPositive);
+      surebetStatus.textContent = isPositive
+        ? "Surebet teorica detectada con margen positivo."
+        : fixedOverBudget
+          ? "La apuesta fija supera el presupuesto total. Ajusta el stake fijo o el presupuesto."
+          : uncoveredRows.length
+            ? "Hay resultados sin cubrir. Marca distribuir o fija un stake para todos los resultados necesarios."
+            : "No hay surebet con estos datos. Ajusta cuotas, stake o comisiones.";
+
+      profitRows.innerHTML = calculatedRows.map((row, index) => {
+        const profit = profits[index] || 0;
+        return `
+          <div class="profit-row ${profit >= 0 ? "positive" : "negative"}">
+            <span>${escapeHtml(row.label)}</span>
+            <strong>${profit >= 0 ? "+" : ""}${formatMoney(profit, currency)}</strong>
+          </div>
+        `;
+      }).join("");
+    }
+
+    outcomeCount.addEventListener("change", () => renderRows());
+    [surebetBudget, surebetCurrency, stakeRounding, useCommissions, useExchangeRates].forEach((control) => {
+      control.addEventListener("input", () => {
+        updateAdvancedFields();
+        updateSurebetCalculator();
+      });
+      control.addEventListener("change", () => {
+        updateAdvancedFields();
+        updateSurebetCalculator();
+      });
+    });
+    resetCalculator.addEventListener("click", () => {
+      outcomeCount.value = "3";
+      surebetBudget.value = "200";
+      surebetCurrency.value = "EUR";
+      stakeRounding.value = "0.01";
+      useCommissions.checked = false;
+      useExchangeRates.checked = false;
+      renderRows(defaultRows);
+    });
+    surebetRows.addEventListener("input", updateSurebetCalculator);
+    surebetRows.addEventListener("change", (event) => {
+      if (event.target.classList.contains("fixed-check")) {
+        normalizeFixedRows(event.target);
+      } else {
+        normalizeFixedRows();
+      }
+      updateSurebetCalculator();
+    });
+    renderRows(defaultRows);
+  </script>
+</body>
+</html>
