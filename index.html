@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArbiRadar | Bot de surebets y value bets</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #111827;
+      --muted: #5d6677;
+      --paper: #ffffff;
+      --line: #d9e0ea;
+      --teal: #127a7d;
+      --blue: #234c9f;
+      --green: #1f7a55;
+      --amber: #b56816;
+      --rose: #b74259;
+      --dark: #0f172a;
+      --soft: #f5f7fb;
+      --shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #f7f9fc;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.48;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .shell {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 5;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 0;
+      color: #ffffff;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 19px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .nav a {
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 82vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      color: #ffffff;
+      background:
+        linear-gradient(90deg, rgba(7, 12, 24, 0.88) 0%, rgba(7, 12, 24, 0.70) 50%, rgba(7, 12, 24, 0.32) 100%),
+        url("https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1800&q=80") center/cover;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: min(720px, 100%);
+      padding: 118px 0 76px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 8px 11px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(46px, 8vw, 92px);
+      line-height: 0.96;
+      max-width: 760px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin-top: 22px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 20px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .button.primary {
+      background: #ffffff;
+      color: var(--dark);
+    }
+
+    .button.secondary {
+      border-color: rgba(255, 255, 255, 0.42);
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+    }
+
+    .hero-note {
+      margin-top: 18px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+    }
+
+    .trust-strip {
+      position: relative;
+      z-index: 3;
+      margin-top: -38px;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .trust-item,
+    .panel,
+    .plan,
+    .faq-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .trust-item {
+      padding: 18px;
+      min-height: 92px;
+    }
+
+    .trust-item strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+
+    .trust-item span,
+    .muted {
+      color: var(--muted);
+    }
+
+    section {
+      padding: 76px 0 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .section-title h2 {
+      font-size: 34px;
+      line-height: 1.08;
+    }
+
+    .section-title p {
+      max-width: 620px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .grid-three {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 24px;
+      box-shadow: none;
+    }
+
+    .panel h3,
+    .plan h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .panel p,
+    .plan p,
+    .faq-item p {
+      color: var(--muted);
+    }
+
+    .product-frame {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .phone {
+      border-radius: 28px;
+      background: #101827;
+      padding: 14px;
+      min-height: 520px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(15, 23, 42, 0.20);
+    }
+
+    .phone-screen {
+      height: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.98));
+      color: #ffffff;
+      padding: 18px;
+    }
+
+    .phone-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+    }
+
+    .bot-bubble,
+    .user-bubble {
+      width: fit-content;
+      max-width: 92%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .bot-bubble {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .user-bubble {
+      margin-left: auto;
+      background: #6d5dfc;
+    }
+
+    .alert-card {
+      margin-top: 18px;
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      padding: 16px;
+    }
+
+    .alert-card strong {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .alert-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 8px 0;
+      border-top: 1px solid #e6ebf2;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .alert-line b {
+      color: var(--ink);
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    .step-index {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: #e7f5f5;
+      color: var(--teal);
+      font-weight: 800;
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: 1fr 0.95fr;
+      gap: 18px;
+    }
+
+    .control {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .control:last-child {
+      border-bottom: 0;
+    }
+
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--teal);
+    }
+
+    .result-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100%;
+      padding: 24px;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .result-stack {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .result-box.max {
+      background: #123f3f;
+    }
+
+    .result-box small {
+      color: rgba(255, 255, 255, 0.68);
+    }
+
+    .result-value {
+      margin: 14px 0;
+      font-size: 46px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .conversion-cta {
+      margin-top: 18px;
+      padding: 24px;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .conversion-cta h3 {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .conversion-cta p {
+      color: rgba(255, 255, 255, 0.76);
+    }
+
+    .conversion-cta .button {
+      background: #ffffff;
+      color: var(--dark);
+      flex: 0 0 auto;
+    }
+
+    .quick-card,
+    .confidence-card {
+      padding: 22px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    .quick-card strong,
+    .confidence-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 19px;
+    }
+
+    .quick-card span {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      background: #e8f4ff;
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .confidence-card {
+      border-left: 5px solid var(--teal);
+    }
+
+    .plans {
+      align-items: stretch;
+    }
+
+    .plan {
+      padding: 24px;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .plan.featured {
+      border-color: #93d7d2;
+      background: #f1fbfa;
+    }
+
+    .price {
+      font-size: 36px;
+      font-weight: 900;
+    }
+
+    .price small {
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .plan ul {
+      display: grid;
+      gap: 8px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      color: var(--muted);
+    }
+
+    .plan li::before {
+      content: "+";
+      color: var(--green);
+      font-weight: 900;
+      margin-right: 8px;
+    }
+
+    .plan .button {
+      margin-top: auto;
+      background: var(--dark);
+      color: #ffffff;
+    }
+
+    .faq-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .faq-item {
+      padding: 20px;
+      box-shadow: none;
+    }
+
+    .footer {
+      margin-top: 76px;
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        position: absolute;
+      }
+
+      .topbar-inner,
+      .section-title {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        min-height: 760px;
+      }
+
+      .hero-content {
+        padding-top: 140px;
+      }
+
+      .trust-grid,
+      .grid-two,
+      .grid-three,
+      .product-frame,
+      .calculator,
+      .faq-list {
+        grid-template-columns: 1fr;
+      }
+
+      .conversion-cta {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .trust-strip {
+        margin-top: 0;
+        padding-top: 16px;
+      }
+
+      .phone {
+        min-height: 470px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .shell {
+        width: min(100% - 24px, 1160px);
+      }
+
+      .nav a {
+        padding: 8px 10px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .hero p {
+        font-size: 18px;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .section-title h2 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="#inicio" aria-label="ArbiRadar inicio">
+        <span class="brand-mark">AR</span>
+        <span>ArbiRadar</span>
+      </a>
+      <nav class="nav" aria-label="Navegacion principal">
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#simulador">Simulador</a>
+        <a href="#planes">Planes</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero" aria-label="ArbiRadar landing">
+      <div class="shell">
+        <div class="hero-content">
+          <span class="kicker">Bot de Telegram para analizar cuotas</span>
+          <h1>ArbiRadar</h1>
+          <p>
+            Detecta posibles surebets y value bets, recibe alertas en Telegram y filtra
+            oportunidades por deportes y casas sin instalar ninguna app nueva.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Abrir bot en Telegram</a>
+            <a class="button secondary" href="#simulador">Calcular escenario mensual</a>
+          </div>
+          <div class="hero-note">
+            +18. Herramienta informativa. No realiza apuestas automaticas ni garantiza beneficios.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="trust-strip">
+      <div class="shell trust-grid" aria-label="Resumen rapido">
+        
+          <div class="trust-item">
+            <strong>Alertas informativas en Telegram</strong>
+            <span>Disenado para tomar decisiones mas rapido, no para apostar por ti.</span>
+          </div>
+        
+          <div class="trust-item">
+            <strong>Surebets y value bets filtradas</strong>
+            <span>Disenado para tomar decisiones mas rapido, no para apostar por ti.</span>
+          </div>
+        
+          <div class="trust-item">
+            <strong>Sin apuestas automaticas</strong>
+            <span>Disenado para tomar decisiones mas rapido, no para apostar por ti.</span>
+          </div>
+        
+          <div class="trust-item">
+            <strong>Control de deportes y casas</strong>
+            <span>Disenado para tomar decisiones mas rapido, no para apostar por ti.</span>
+          </div>
+        
+      </div>
+    </div>
+
+    <section id="como-funciona">
+      <div class="shell product-frame">
+        <div>
+          <div class="section-title">
+            <div>
+              <h2>Un radar, no una casa de apuestas</h2>
+              <p>
+                ArbiRadar compara cuotas, calcula margenes y te avisa cuando detecta una
+                oportunidad interesante. Tu sigues teniendo el control.
+              </p>
+            </div>
+          </div>
+          <div class="steps">
+            
+              <div class="step">
+                <div class="step-index">1</div>
+                <div>
+                  <h3>Configuras tu radar</h3>
+                  <p>Elige deportes y casas para que el bot busque solo lo que te interesa.</p>
+                </div>
+              </div>
+            
+              <div class="step">
+                <div class="step-index">2</div>
+                <div>
+                  <h3>Analiza cuotas</h3>
+                  <p>ArbiRadar consulta proveedores externos y calcula posibles margenes.</p>
+                </div>
+              </div>
+            
+              <div class="step">
+                <div class="step-index">3</div>
+                <div>
+                  <h3>Recibes la alerta</h3>
+                  <p>La oportunidad llega a Telegram con mercado, cuotas, stake orientativo y ROI.</p>
+                </div>
+              </div>
+            
+              <div class="step">
+                <div class="step-index">4</div>
+                <div>
+                  <h3>Decides tu</h3>
+                  <p>El bot no apuesta por ti ni gestiona dinero. Tu revisas si la cuota sigue disponible.</p>
+                </div>
+              </div>
+            
+          </div>
+        </div>
+
+        <div class="phone" aria-label="Vista simulada de alerta Telegram">
+          <div class="phone-screen">
+            <div class="phone-top">
+              <span>Telegram</span>
+              <strong>ArbiRadar Bot</strong>
+            </div>
+            <div class="user-bubble">Buscar surebets</div>
+            <div class="bot-bubble">Analizando cuotas en tus casas activas...</div>
+            <div class="alert-card">
+              <strong>Posible surebet detectada</strong>
+              <div class="alert-line">
+                <span>Mercado</span>
+                <b>Resultado final</b>
+              </div>
+              <div class="alert-line">
+                <span>ROI teorico</span>
+                <b>3.8%</b>
+              </div>
+              <div class="alert-line">
+                <span>Casa A</span>
+                <b>Local @ 2.35</b>
+              </div>
+              <div class="alert-line">
+                <span>Casa B</span>
+                <b>Visitante @ 2.12</b>
+              </div>
+            </div>
+            <div class="bot-bubble">
+              Revisa que las cuotas sigan disponibles antes de hacer nada. Las oportunidades cambian rapido.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-title">
+          <div>
+            <h2>Que puedes encontrar</h2>
+            <p>
+              La clave no es adivinar resultados. Es detectar diferencias de precio entre casas
+              y actuar solo cuando el calculo tiene sentido.
+            </p>
+          </div>
+        </div>
+        <div class="grid-three">
+          <article class="panel">
+            <h3>Surebets</h3>
+            <p>
+              Arbitraje teorico entre cuotas de distintas casas. Si todas las condiciones se mantienen,
+              el margen puede ser positivo cubriendo resultados.
+            </p>
+          </article>
+          <article class="panel">
+            <h3>Value bets</h3>
+            <p>
+              Cuotas que parecen estar por encima de la probabilidad estimada. Son oportunidades
+              estadisticas, no beneficios seguros.
+            </p>
+          </article>
+          <article class="panel">
+            <h3>Filtros utiles</h3>
+            <p>
+              Elige deportes y casas para reducir ruido. Premium desbloquea busquedas con menos
+              limitaciones que el plan gratuito.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="simulador">
+      <div class="shell">
+        <div class="section-title">
+          <div>
+            <h2>Simula un escenario mensual</h2>
+            <p>
+              Usa estos numeros como orientacion bruta. No descuentan cambios de cuota, limites,
+              comisiones, errores de ejecucion ni restricciones de cada casa.
+            </p>
+          </div>
+        </div>
+        <div class="calculator">
+          <div class="panel">
+            <div class="control">
+              <label for="ops">Oportunidades aprovechadas al mes <span id="opsValue">40</span></label>
+              <input id="ops" type="range" min="1" max="120" value="40">
+            </div>
+            <div class="control">
+              <label for="stake">Importe medio por oportunidad <span id="stakeValue">200 EUR</span></label>
+              <input id="stake" type="range" min="10" max="500" step="10" value="200">
+            </div>
+            <div class="control">
+              <label for="roi">ROI medio estimado <span id="roiValue">5%</span></label>
+              <input id="roi" type="range" min="1" max="12" step="0.5" value="5">
+            </div>
+            <div class="control">
+              <label for="maxRoi">ROI medio estimado con Premium Max <span id="maxRoiValue">10%</span></label>
+              <input id="maxRoi" type="range" min="2" max="18" step="0.5" value="10">
+            </div>
+          </div>
+          <div class="result-stack">
+            <div class="result-box">
+              <small>Potencial bruto mensual estimado</small>
+              <div class="result-value" id="monthlyResult">400 EUR</div>
+              <p>
+                Escenario base con el ROI medio seleccionado.
+              </p>
+            </div>
+            <div class="result-box max">
+              <small>Escenario Premium Max</small>
+              <div class="result-value" id="maxMonthlyResult">800 EUR</div>
+              <p>
+                Hipotesis con mayor ROI medio. Depende de disponibilidad, rapidez,
+                limites y aceptacion de cuotas. No es una promesa de resultado.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="conversion-cta">
+          <div>
+            <h3>Empieza gratis y mira si el radar encaja contigo</h3>
+            <p>Abre el bot, prueba el flujo y decide despues si Premium o Max tienen sentido para tu forma de operar.</p>
+          </div>
+          <a class="button" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Probar ArbiRadar en Telegram</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="inicio-rapido">
+      <div class="shell">
+        <div class="section-title">
+          <div>
+            <h2>Empiezas en menos de 60 segundos</h2>
+            <p>Sin registro web, sin instalar nada raro y sin dejar dinero en la plataforma.</p>
+          </div>
+        </div>
+        <div class="grid-three">
+          <article class="quick-card">
+            <span>1</span>
+            <strong>Abre Telegram</strong>
+            <p>Pulsa el boton y entra directamente al bot de ArbiRadar.</p>
+          </article>
+          <article class="quick-card">
+            <span>2</span>
+            <strong>Configura tu radar</strong>
+            <p>Selecciona deportes y casas para que las alertas tengan menos ruido.</p>
+          </article>
+          <article class="quick-card">
+            <span>3</span>
+            <strong>Recibe oportunidades</strong>
+            <p>Consulta surebets y value bets con ROI, cuotas y stakes orientativos.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="confianza">
+      <div class="shell">
+        <div class="section-title">
+          <div>
+            <h2>Hecho para analizar, no para prometer humo</h2>
+            <p>La propuesta es sencilla: mas velocidad, calculos claros y control para ti.</p>
+          </div>
+        </div>
+        <div class="grid-three">
+          <article class="confidence-card">
+            <strong>No apostamos por ti</strong>
+            <p>ArbiRadar no ejecuta apuestas automaticas ni toca fondos de usuarios.</p>
+          </article>
+          <article class="confidence-card">
+            <strong>Empiezas en Free</strong>
+            <p>Puedes probar el bot antes de decidir si una suscripcion encaja contigo.</p>
+          </article>
+          <article class="confidence-card">
+            <strong>Alertas con contexto</strong>
+            <p>Cada oportunidad incluye mercado, cuotas, ROI y reparto orientativo de stake.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="planes">
+      <div class="shell">
+        <div class="section-title">
+          <div>
+            <h2>Planes simples para empezar</h2>
+            <p>No necesitas cuenta web. Entras al bot, eliges plan y gestionas todo desde Telegram.</p>
+          </div>
+        </div>
+        <div class="grid-three plans">
+          <article class="plan">
+            <h3>Free</h3>
+            <div class="price">0 EUR</div>
+            <p>Para probar el flujo y entender como trabaja el bot.</p>
+            <ul>
+              <li>Menu Telegram</li>
+              <li>Filtros de deportes y casas</li>
+              <li>Busquedas con limites de plan</li>
+            </ul>
+            <a class="button" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Probar bot</a>
+          </article>
+          <article class="plan featured">
+            <h3>Premium</h3>
+            <div class="price">30 EUR <small>/mes</small></div>
+            <p>Para recibir mas valor del radar y buscar oportunidades sin el limite bajo del plan gratuito.</p>
+            <ul>
+              <li>Surebets sin limite superior de plan</li>
+              <li>Value bets sin limite superior de plan</li>
+              <li>Alertas y busquedas desde Telegram</li>
+            </ul>
+            <a class="button" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Entrar a Premium</a>
+          </article>
+          <article class="plan">
+            <h3>Premium Max</h3>
+            <div class="price">49 EUR <small>/mes</small></div>
+            <p>Para usuarios que quieren prioridad y acceso anticipado a mejoras del producto.</p>
+            <ul>
+              <li>Todo lo de Premium</li>
+              <li>Prioridad operativa</li>
+              <li>Acceso anticipado a nuevas funciones</li>
+            </ul>
+            <a class="button" href="https://t.me/surebet_erik_bot" rel="noopener" target="_blank">Ver Max</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="shell">
+        <div class="section-title">
+          <div>
+            <h2>Preguntas frecuentes</h2>
+            <p>Lo importante antes de pagar: que hace, que no hace y que riesgos debes tener claros.</p>
+          </div>
+        </div>
+        <div class="faq-list">
+          
+            <article class="faq-item">
+              <h3>Que es una surebet?</h3>
+              <p>Es una oportunidad teorica de arbitraje: al combinar cuotas de distintas casas, el calculo puede dejar margen positivo cubriendo todos los resultados. Depende de que las cuotas sigan vivas, los limites permitan operar y no haya errores.</p>
+            </article>
+          
+            <article class="faq-item">
+              <h3>Que es una value bet?</h3>
+              <p>Es una cuota que parece superior a la probabilidad estimada por el mercado. No garantiza beneficio; se evalua como ventaja estadistica potencial.</p>
+            </article>
+          
+            <article class="faq-item">
+              <h3>Tengo que registrarme en una web?</h3>
+              <p>No. ArbiRadar funciona desde Telegram. La web sirve para entender el producto y entrar al bot.</p>
+            </article>
+          
+            <article class="faq-item">
+              <h3>El bot apuesta automaticamente?</h3>
+              <p>No. ArbiRadar solo muestra informacion y calculos. No ejecuta apuestas ni custodia fondos de usuarios.</p>
+            </article>
+          
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <span>ArbiRadar. Herramienta informativa de analisis de cuotas.</span>
+      <span>+18. Juega con responsabilidad. Sin apuestas automaticas ni garantia de beneficio.</span>
+    </div>
+  </footer>
+
+  <script>
+    const ops = document.getElementById("ops");
+    const stake = document.getElementById("stake");
+    const roi = document.getElementById("roi");
+    const maxRoi = document.getElementById("maxRoi");
+    const opsValue = document.getElementById("opsValue");
+    const stakeValue = document.getElementById("stakeValue");
+    const roiValue = document.getElementById("roiValue");
+    const maxRoiValue = document.getElementById("maxRoiValue");
+    const monthlyResult = document.getElementById("monthlyResult");
+    const maxMonthlyResult = document.getElementById("maxMonthlyResult");
+
+    function updateCalculator() {
+      const opsNumber = Number(ops.value);
+      const stakeNumber = Number(stake.value);
+      const roiNumber = Number(roi.value);
+      const maxRoiNumber = Number(maxRoi.value);
+      const monthly = Math.round(opsNumber * stakeNumber * (roiNumber / 100));
+      const maxMonthly = Math.round(opsNumber * stakeNumber * (maxRoiNumber / 100));
+
+      opsValue.textContent = opsNumber;
+      stakeValue.textContent = `${stakeNumber} EUR`;
+      roiValue.textContent = `${roiNumber}%`;
+      maxRoiValue.textContent = `${maxRoiNumber}%`;
+      monthlyResult.textContent = `${monthly} EUR`;
+      maxMonthlyResult.textContent = `${maxMonthly} EUR`;
+    }
+
+    [ops, stake, roi, maxRoi].forEach((control) => {
+      control.addEventListener("input", updateCalculator);
+    });
+    updateCalculator();
+  </script>
+</body>
+</html>
