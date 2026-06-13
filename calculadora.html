@@ -204,7 +204,7 @@
 
     .tool-controls {
       display: grid;
-      grid-template-columns: minmax(150px, 1fr) minmax(130px, 0.95fr) minmax(110px, 0.8fr) minmax(120px, 0.8fr);
+      grid-template-columns: minmax(190px, 1.1fr) minmax(130px, 0.78fr) minmax(130px, 0.78fr) minmax(110px, 0.64fr) minmax(120px, 0.68fr);
       gap: 10px;
       margin-bottom: 12px;
     }
@@ -268,6 +268,7 @@
         minmax(64px, 0.32fr)
         minmax(86px, 0.42fr)
         minmax(104px, 0.52fr)
+        minmax(118px, 0.58fr)
         minmax(92px, 0.48fr)
         minmax(90px, 0.48fr)
         minmax(132px, 0.7fr);
@@ -313,6 +314,18 @@
     }
 
     .mini-field.is-disabled input {
+      background: #eef2f7;
+    }
+
+    .target-profit-field {
+      opacity: 0.48;
+    }
+
+    .target-mode .target-profit-field {
+      opacity: 1;
+    }
+
+    .target-profit-field input:disabled {
       background: #eef2f7;
     }
 
@@ -538,6 +551,13 @@
         <div class="board">
           <div class="tool-controls">
             <div class="field">
+              <label for="calculationMode">Modo de calculo</label>
+              <select id="calculationMode">
+                <option value="balanced" selected>Equilibrar retorno</option>
+                <option value="targets">Objetivo por resultado</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="outcomeCount">Resultados</label>
               <select id="outcomeCount">
                 <option value="2">2 resultados</option>
@@ -585,6 +605,7 @@
             <span>Fija</span>
             <span>Distribuir</span>
             <span>Stake fijo</span>
+            <span>Objetivo</span>
             <span>Comision</span>
             <span>Cambio</span>
             <span>Stake recomendado</span>
@@ -593,6 +614,7 @@
           <p class="tool-note">
             Sin apuesta fija, la calculadora reparte la apuesta total. Con una fija activa,
             esa cantidad define el retorno objetivo y las demas apuestas se adaptan automaticamente.
+            En modo objetivo, escribe cuanto quieres ganar en cada resultado; 0 significa recuperar.
           </p>
         </div>
 
@@ -650,6 +672,7 @@
   </footer>
 
   <script>
+    const calculationMode = document.getElementById("calculationMode");
     const outcomeCount = document.getElementById("outcomeCount");
     const surebetBudget = document.getElementById("surebetBudget");
     const surebetCurrency = document.getElementById("surebetCurrency");
@@ -666,11 +689,11 @@
     const profitRows = document.getElementById("profitRows");
 
     const defaultRows = [
-      { label: "Real Madrid gana", odd: 3.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
-      { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
-      { label: "FC Barcelona gana", odd: 3.07, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
-      { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
-      { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Real Madrid gana", odd: 3.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
+      { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
+      { label: "FC Barcelona gana", odd: 3.07, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
+      { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
+      { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
     ];
 
     function escapeHtml(value) {
@@ -709,6 +732,7 @@
         fixed: row.querySelector(".fixed-check").checked,
         distribute: row.querySelector(".distribute-check").checked,
         fixedStake: row.querySelector(".fixed-amount-input").value,
+        targetProfit: numberFrom(row.querySelector(".target-profit-input").value, 0),
         commission: numberFrom(row.querySelector(".commission-input").value, 0),
         rate: numberFrom(row.querySelector(".rate-input").value, 1),
       }));
@@ -744,6 +768,10 @@
             <label for="fixed-amount-${index}">Stake fijo</label>
             <input id="fixed-amount-${index}" class="fixed-amount-input" type="number" min="0" step="0.01" value="${escapeHtml(row.fixedStake)}" placeholder="0.00">
           </div>
+          <div class="mini-field target-profit-field">
+            <label for="target-profit-${index}">Beneficio objetivo</label>
+            <input id="target-profit-${index}" class="target-profit-input" type="number" min="0" step="0.01" value="${row.targetProfit}">
+          </div>
           <div class="mini-field" data-advanced="commission">
             <label for="commission-${index}">Comision %</label>
             <input id="commission-${index}" class="commission-input" type="number" min="0" max="99" step="0.1" value="${row.commission}">
@@ -757,6 +785,7 @@
       `).join("");
 
       normalizeFixedRows();
+      updateModeFields();
       updateAdvancedFields();
       updateSurebetCalculator();
     }
@@ -803,6 +832,20 @@
       });
     }
 
+    function updateModeFields() {
+      const targetsOn = calculationMode.value === "targets";
+      document.body.classList.toggle("target-mode", targetsOn);
+      surebetBudget.disabled = targetsOn;
+      surebetRows.querySelectorAll(".surebet-row").forEach((row) => {
+        const fixedActive = row.querySelector(".fixed-check").checked;
+        const field = row.querySelector(".target-profit-field");
+        const input = row.querySelector(".target-profit-input");
+        const disabled = !targetsOn || fixedActive;
+        field.classList.toggle("is-disabled", disabled);
+        input.disabled = disabled;
+      });
+    }
+
     function effectiveOdd(odd, commission) {
       const safeOdd = Math.max(1.01, odd);
       const safeCommission = Math.min(Math.max(commission, 0), 99);
@@ -816,6 +859,7 @@
 
     function updateSurebetCalculator() {
       const currency = surebetCurrency.value;
+      const targetsMode = calculationMode.value === "targets";
       const targetBudget = Math.max(1, numberFrom(surebetBudget.value, 200));
       const rounding = Math.max(0.01, numberFrom(stakeRounding.value, 0.01));
       const rows = readRows().map((row, index) => {
@@ -827,6 +871,7 @@
           rate,
           effectiveOdd: effectiveOdd(row.odd, commission),
           fixedStake: Math.max(0, numberFrom(row.fixedStake, 0)),
+          targetProfit: Math.max(0, numberFrom(row.targetProfit, 0)),
         };
       });
 
@@ -834,18 +879,37 @@
       const distributedRows = rows.filter((row) => !row.fixed && row.distribute);
       const fixedRow = fixedRows[0] || null;
       const distributedInverseSum = distributedRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
-      const targetReturn = fixedRow
+      const coveredTargetRows = rows.filter((row) => row.fixed || row.distribute);
+      const targetNumerator = distributedRows.reduce((total, row) => total + (row.targetProfit / row.effectiveOdd), 0);
+      const targetDenominator = 1 - distributedInverseSum;
+      const hasUsefulTargets = coveredTargetRows.some((row) => row.targetProfit > 0) || Boolean(fixedRow);
+      const targetModeInvalid = targetsMode && (!hasUsefulTargets || targetDenominator <= 0);
+      const balancedReturn = fixedRow
         ? fixedRow.fixedStake * fixedRow.effectiveOdd
         : distributedInverseSum > 0
           ? targetBudget / distributedInverseSum
           : 0;
+      const targetModeTotalStake = targetModeInvalid
+        ? 0
+        : fixedRow
+          ? (fixedRow.fixedStake + targetNumerator) / targetDenominator
+          : targetNumerator / targetDenominator;
 
       const calculatedRows = rows.map((row) => {
-        const rawStake = row.fixed
-          ? row.fixedStake
-          : row.distribute
-            ? targetReturn / row.effectiveOdd
-            : 0;
+        let rawStake = 0;
+        if (targetsMode) {
+          if (row.fixed) {
+            rawStake = row.fixedStake;
+          } else if (row.distribute && !targetModeInvalid) {
+            rawStake = (targetModeTotalStake + row.targetProfit) / row.effectiveOdd;
+          }
+        } else {
+          rawStake = row.fixed
+            ? row.fixedStake
+            : row.distribute
+              ? balancedReturn / row.effectiveOdd
+              : 0;
+        }
         const stake = roundTo(rawStake, rounding);
         return {
           ...row,
@@ -877,14 +941,20 @@
 
       const uncoveredRows = calculatedRows.filter((row) => row.stake <= 0);
       const fixedWithoutStake = Boolean(fixedRow && fixedRow.fixedStake <= 0);
-      const isPositive = minimumProfit > 0 && uncoveredRows.length === 0 && !fixedWithoutStake;
+      const isPositive = minimumProfit > 0 && uncoveredRows.length === 0 && !fixedWithoutStake && !targetModeInvalid;
       surebetStatus.classList.toggle("positive", isPositive);
       surebetStatus.classList.toggle("negative", !isPositive);
       surebetStatus.textContent = isPositive
-        ? fixedRow
+        ? targetsMode
+          ? "Objetivos aplicados: los stakes se han adaptado a los beneficios indicados."
+          : fixedRow
           ? "Stake fijo aplicado: el resto de apuestas se ha ajustado al mismo retorno teorico."
           : "Surebet teorica detectada con margen positivo."
-        : fixedWithoutStake
+        : targetsMode && !hasUsefulTargets
+          ? "En modo objetivo, introduce al menos un beneficio positivo o una apuesta fija."
+          : targetsMode && targetDenominator <= 0
+            ? "Con estas cuotas no hay margen suficiente para cubrir esos objetivos."
+            : fixedWithoutStake
           ? "Introduce una cantidad en la apuesta fija para adaptar el resto de resultados."
           : uncoveredRows.length
             ? "Hay resultados sin cubrir. Marca distribuir o fija un stake para todos los resultados necesarios."
@@ -902,17 +972,20 @@
     }
 
     outcomeCount.addEventListener("change", () => renderRows());
-    [surebetBudget, surebetCurrency, stakeRounding, useCommissions, useExchangeRates].forEach((control) => {
+    [calculationMode, surebetBudget, surebetCurrency, stakeRounding, useCommissions, useExchangeRates].forEach((control) => {
       control.addEventListener("input", () => {
+        updateModeFields();
         updateAdvancedFields();
         updateSurebetCalculator();
       });
       control.addEventListener("change", () => {
+        updateModeFields();
         updateAdvancedFields();
         updateSurebetCalculator();
       });
     });
     resetCalculator.addEventListener("click", () => {
+      calculationMode.value = "balanced";
       outcomeCount.value = "3";
       surebetBudget.value = "200";
       surebetCurrency.value = "EUR";
@@ -928,6 +1001,7 @@
       } else {
         normalizeFixedRows();
       }
+      updateModeFields();
       updateSurebetCalculator();
     });
     renderRows(defaultRows);
