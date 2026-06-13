@@ -342,9 +342,28 @@
       padding: 16px;
     }
 
+    .alert-kicker {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #e8fff4;
+      color: #0f7a49;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
     .alert-card strong {
       display: block;
       margin-bottom: 10px;
+    }
+
+    .event-name {
+      margin-bottom: 12px;
+      font-size: 15px;
+      font-weight: 800;
     }
 
     .alert-line {
@@ -359,6 +378,78 @@
 
     .alert-line b {
       color: var(--ink);
+    }
+
+    .alert-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .alert-metric {
+      border-radius: 8px;
+      background: #f5f8fc;
+      border: 1px solid #e6ebf2;
+      padding: 10px;
+    }
+
+    .alert-metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .alert-metric b {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .alert-metric.profit {
+      background: #ecfff5;
+      border-color: #b7f0d2;
+    }
+
+    .alert-metric.profit b {
+      color: #0f7a49;
+    }
+
+    .stake-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stake-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 0;
+      border-top: 1px solid #e6ebf2;
+    }
+
+    .stake-row b {
+      display: block;
+      color: var(--ink);
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .stake-row small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stake-row strong {
+      margin: 0;
+      color: #0f7a49;
+      font-size: 13px;
+      text-align: right;
+      white-space: nowrap;
     }
 
     .steps {
@@ -776,26 +867,57 @@
             <div class="user-bubble">Buscar surebets</div>
             <div class="bot-bubble">Analizando cuotas en tus casas activas...</div>
             <div class="alert-card">
-              <strong>Posible surebet detectada</strong>
+              <div class="alert-kicker">Ejemplo visual</div>
+              <strong>Surebet encontrada</strong>
+              <div class="event-name">Real Madrid vs FC Barcelona</div>
               <div class="alert-line">
                 <span>Mercado</span>
                 <b>Resultado final</b>
               </div>
-              <div class="alert-line">
-                <span>ROI teorico</span>
-                <b>3.8%</b>
+              <div class="alert-metrics">
+                <div class="alert-metric">
+                  <span>Inversion total</span>
+                  <b>200 EUR</b>
+                </div>
+                <div class="alert-metric profit">
+                  <span>Ganancia estimada</span>
+                  <b>+10.50 EUR</b>
+                </div>
+                <div class="alert-metric">
+                  <span>ROI teorico</span>
+                  <b>5.2%</b>
+                </div>
+                <div class="alert-metric">
+                  <span>Retorno estimado</span>
+                  <b>210.50 EUR</b>
+                </div>
               </div>
-              <div class="alert-line">
-                <span>Casa A</span>
-                <b>Local @ 2.35</b>
-              </div>
-              <div class="alert-line">
-                <span>Casa B</span>
-                <b>Visitante @ 2.12</b>
+              <div class="stake-list" aria-label="Reparto simulado de stakes">
+                <div class="stake-row">
+                  <span>
+                    <b>Real Madrid gana</b>
+                    <small>Casa A @ 2.60</small>
+                  </span>
+                  <strong>80.96 EUR</strong>
+                </div>
+                <div class="stake-row">
+                  <span>
+                    <b>Empate</b>
+                    <small>Casa B @ 3.85</small>
+                  </span>
+                  <strong>54.68 EUR</strong>
+                </div>
+                <div class="stake-row">
+                  <span>
+                    <b>FC Barcelona gana</b>
+                    <small>Casa C @ 3.27</small>
+                  </span>
+                  <strong>64.36 EUR</strong>
+                </div>
               </div>
             </div>
             <div class="bot-bubble">
-              Revisa que las cuotas sigan disponibles antes de hacer nada. Las oportunidades cambian rapido.
+              Datos ficticios para entender el formato. Revisa cuotas, limites y disponibilidad antes de hacer nada.
             </div>
           </div>
         </div>
