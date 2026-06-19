@@ -593,9 +593,9 @@
             <div class="field">
               <label for="stakeRounding">Redondeo</label>
               <select id="stakeRounding">
-                <option value="0.01" selected>0.01</option>
+                <option value="0.01">0.01</option>
                 <option value="0.1">0.10</option>
-                <option value="1">1</option>
+                <option value="1" selected>1</option>
                 <option value="5">5</option>
               </select>
             </div>
@@ -633,23 +633,23 @@
           <div class="summary-grid">
             <div class="summary-metric">
               <span>Apuesta real</span>
-              <b id="actualStakeResult">200.00 EUR</b>
+              <b id="actualStakeResult">250.00 EUR</b>
             </div>
             <div class="summary-metric">
               <span>Suma inversa</span>
-              <b id="inverseSumResult">90.91%</b>
+              <b id="inverseSumResult">100.00%</b>
             </div>
             <div class="summary-metric profit">
               <span>Beneficio minimo</span>
-              <b id="minimumProfitResult">+20.00 EUR</b>
+              <b id="minimumProfitResult">+0.00 EUR</b>
             </div>
             <div class="summary-metric profit">
               <span>ROI teorico</span>
-              <b id="surebetRoiResult">10.0%</b>
+              <b id="surebetRoiResult">0.0%</b>
             </div>
           </div>
-          <div id="surebetStatus" class="surebet-status positive">
-            Surebet teorica detectada con margen positivo.
+          <div id="surebetStatus" class="surebet-status negative">
+            Ajusta las cuotas para ver si hay beneficio o cobertura.
           </div>
           <div>
             <strong>Beneficio si gana cada resultado</strong>
@@ -701,8 +701,8 @@
     const profitRows = document.getElementById("profitRows");
 
     const defaultRows = [
-      { label: "Apuesta 1", odd: 1.20, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
-      { label: "Apuesta 2", odd: 9.50, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Apuesta 1", odd: "2.00", fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Apuesta 2", odd: "2.00", fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
       { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
       { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
       { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
@@ -750,7 +750,7 @@
     }
 
     function renderRows(rows = null) {
-      const count = numberFrom(outcomeCount.value, 3);
+      const count = numberFrom(outcomeCount.value, 2);
       const previousRows = rows || readRows();
       const activeRows = Array.from({ length: count }, (_, index) => ({
         ...defaultRows[index],
@@ -854,7 +854,7 @@
     function updateSurebetCalculator() {
       const currency = surebetCurrency.value;
       const targetBudget = Math.max(1, numberFrom(surebetBudget.value, 250));
-      const rounding = Math.max(0.01, numberFrom(stakeRounding.value, 0.01));
+      const rounding = Math.max(0.01, numberFrom(stakeRounding.value, 1));
       const rows = readRows().map((row, index) => {
         const commission = useCommissions.checked ? row.commission : 0;
         const rate = useExchangeRates.checked ? Math.max(row.rate, 0.0001) : 1;
@@ -1042,7 +1042,7 @@
       totalDistribute.checked = true;
       totalFixed.checked = true;
       surebetCurrency.value = "EUR";
-      stakeRounding.value = "0.01";
+      stakeRounding.value = "1";
       useCommissions.checked = false;
       useExchangeRates.checked = false;
       renderRows(defaultRows);
