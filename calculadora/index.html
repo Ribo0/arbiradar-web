@@ -554,7 +554,7 @@
               <label for="calculationMode">Modo de calculo</label>
               <select id="calculationMode">
                 <option value="balanced" selected>Equilibrar retorno</option>
-                <option value="targets">Objetivo por resultado</option>
+                <option value="targets">Cobertura con total fijo</option>
               </select>
             </div>
             <div class="field">
@@ -614,7 +614,7 @@
           <p class="tool-note">
             Sin apuesta fija, la calculadora reparte la apuesta total. Con una fija activa,
             esa cantidad define el retorno objetivo y las demas apuestas se adaptan automaticamente.
-            En modo objetivo, escribe cuanto quieres ganar en cada resultado; 0 significa recuperar.
+            En cobertura, la apuesta total manda: objetivo 0 significa recuperar y un objetivo positivo prioriza beneficio.
           </p>
         </div>
 
@@ -654,7 +654,7 @@
         </article>
         <article class="info-panel">
           <h3>Distribuir</h3>
-          <p>Marca los resultados que quieres cubrir automaticamente. Puedes activarlos o desactivarlos por separado.</p>
+          <p>En equilibrio cubre los resultados marcados. En cobertura, marca el resultado que quieres priorizar; los demas intentan quedar a recuperar.</p>
         </article>
         <article class="info-panel">
           <h3>Lectura del ROI</h3>
@@ -689,11 +689,11 @@
     const profitRows = document.getElementById("profitRows");
 
     const defaultRows = [
-      { label: "Real Madrid gana", odd: 3.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
-      { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
-      { label: "FC Barcelona gana", odd: 3.07, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
-      { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
-      { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 20, commission: 0, rate: 1 },
+      { label: "Real Madrid gana", odd: 3.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 30, commission: 0, rate: 1 },
+      { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
+      { label: "FC Barcelona gana", odd: 3.07, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
+      { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
+      { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
     ];
 
     function escapeHtml(value) {
@@ -835,12 +835,13 @@
     function updateModeFields() {
       const targetsOn = calculationMode.value === "targets";
       document.body.classList.toggle("target-mode", targetsOn);
-      surebetBudget.disabled = targetsOn;
+      surebetBudget.disabled = false;
       surebetRows.querySelectorAll(".surebet-row").forEach((row) => {
         const fixedActive = row.querySelector(".fixed-check").checked;
+        const distributeActive = row.querySelector(".distribute-check").checked;
         const field = row.querySelector(".target-profit-field");
         const input = row.querySelector(".target-profit-input");
-        const disabled = !targetsOn || fixedActive;
+        const disabled = !targetsOn || fixedActive || !distributeActive;
         field.classList.toggle("is-disabled", disabled);
         input.disabled = disabled;
       });
@@ -877,31 +878,33 @@
 
       const fixedRows = rows.filter((row) => row.fixed);
       const distributedRows = rows.filter((row) => !row.fixed && row.distribute);
+      const hedgeRows = rows.filter((row) => !row.fixed);
+      const targetRows = hedgeRows.filter((row) => row.distribute && row.targetProfit > 0);
       const fixedRow = fixedRows[0] || null;
       const distributedInverseSum = distributedRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
-      const coveredTargetRows = rows.filter((row) => row.fixed || row.distribute);
-      const targetNumerator = distributedRows.reduce((total, row) => total + (row.targetProfit / row.effectiveOdd), 0);
-      const targetDenominator = 1 - distributedInverseSum;
-      const hasUsefulTargets = coveredTargetRows.some((row) => row.targetProfit > 0) || Boolean(fixedRow);
-      const targetModeInvalid = targetsMode && (!hasUsefulTargets || targetDenominator <= 0);
+      const fixedTotal = fixedRows.reduce((total, row) => total + row.fixedStake, 0);
+      const hedgeRecoveryStake = hedgeRows.reduce((total, row) => total + (targetBudget / row.effectiveOdd), 0);
+      const targetWeightInverseSum = targetRows.reduce((total, row) => total + (row.targetProfit / row.effectiveOdd), 0);
+      const targetBaseRequired = fixedTotal + hedgeRecoveryStake;
+      const targetExtraBudget = targetBudget - targetBaseRequired;
+      const targetScale = targetWeightInverseSum > 0 ? targetExtraBudget / targetWeightInverseSum : 0;
+      const hasPriorityTarget = targetRows.length > 0;
       const balancedReturn = fixedRow
         ? fixedRow.fixedStake * fixedRow.effectiveOdd
         : distributedInverseSum > 0
           ? targetBudget / distributedInverseSum
           : 0;
-      const targetModeTotalStake = targetModeInvalid
-        ? 0
-        : fixedRow
-          ? (fixedRow.fixedStake + targetNumerator) / targetDenominator
-          : targetNumerator / targetDenominator;
 
       const calculatedRows = rows.map((row) => {
         let rawStake = 0;
         if (targetsMode) {
           if (row.fixed) {
             rawStake = row.fixedStake;
-          } else if (row.distribute && !targetModeInvalid) {
-            rawStake = (targetModeTotalStake + row.targetProfit) / row.effectiveOdd;
+          } else if (hasPriorityTarget) {
+            const scaledTarget = row.distribute && row.targetProfit > 0
+              ? row.targetProfit * targetScale
+              : 0;
+            rawStake = (targetBudget + scaledTarget) / row.effectiveOdd;
           }
         } else {
           rawStake = row.fixed
@@ -910,7 +913,7 @@
               ? balancedReturn / row.effectiveOdd
               : 0;
         }
-        const stake = roundTo(rawStake, rounding);
+        const stake = Math.max(0, roundTo(rawStake, rounding));
         return {
           ...row,
           stake,
@@ -940,23 +943,29 @@
       surebetRoiResult.textContent = formatPercent(roiValueNumber, 1);
 
       const uncoveredRows = calculatedRows.filter((row) => row.stake <= 0);
+      const balancedUncoveredRows = !targetsMode ? uncoveredRows : [];
       const fixedWithoutStake = Boolean(fixedRow && fixedRow.fixedStake <= 0);
-      const isPositive = minimumProfit > 0 && uncoveredRows.length === 0 && !fixedWithoutStake && !targetModeInvalid;
+      const recoveryApplied = targetsMode && hasPriorityTarget && minimumProfit >= -0.005 && !fixedWithoutStake;
+      const isPositive = targetsMode
+        ? recoveryApplied
+        : minimumProfit > 0 && balancedUncoveredRows.length === 0 && !fixedWithoutStake;
       surebetStatus.classList.toggle("positive", isPositive);
       surebetStatus.classList.toggle("negative", !isPositive);
       surebetStatus.textContent = isPositive
         ? targetsMode
-          ? "Objetivos aplicados: los stakes se han adaptado a los beneficios indicados."
+          ? targetScale >= 1
+            ? "Cobertura aplicada: el beneficio objetivo se alcanza con el total indicado."
+            : "Cobertura aplicada: se recupera el total, pero el beneficio objetivo queda reducido por las cuotas."
           : fixedRow
           ? "Stake fijo aplicado: el resto de apuestas se ha ajustado al mismo retorno teorico."
           : "Surebet teorica detectada con margen positivo."
-        : targetsMode && !hasUsefulTargets
-          ? "En modo objetivo, introduce al menos un beneficio positivo o una apuesta fija."
-          : targetsMode && targetDenominator <= 0
-            ? "Con estas cuotas no hay margen suficiente para cubrir esos objetivos."
+        : targetsMode && !hasPriorityTarget
+          ? "En cobertura, marca distribuir en el resultado que quieres priorizar y escribe un beneficio objetivo."
+          : targetsMode && targetScale < 0
+            ? "Con estas cuotas no hay margen para recuperar y ganar con ese total. Revisa el beneficio real de cada resultado."
             : fixedWithoutStake
           ? "Introduce una cantidad en la apuesta fija para adaptar el resto de resultados."
-          : uncoveredRows.length
+          : balancedUncoveredRows.length
             ? "Hay resultados sin cubrir. Marca distribuir o fija un stake para todos los resultados necesarios."
             : "No hay surebet con estos datos. Ajusta cuotas, stake o comisiones.";
 
