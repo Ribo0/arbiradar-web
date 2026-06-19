@@ -204,7 +204,7 @@
 
     .tool-controls {
       display: grid;
-      grid-template-columns: minmax(190px, 1.1fr) minmax(130px, 0.78fr) minmax(130px, 0.78fr) minmax(110px, 0.64fr) minmax(120px, 0.68fr);
+      grid-template-columns: minmax(250px, 1.2fr) minmax(130px, 0.62fr) minmax(110px, 0.54fr) minmax(120px, 0.58fr);
       gap: 10px;
       margin-bottom: 12px;
     }
@@ -239,10 +239,19 @@
       margin-bottom: 12px;
     }
 
+    .total-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 7px;
+      align-items: stretch;
+    }
+
     .switch-line,
-    .check-cell {
+    .check-cell,
+    .mini-toggle {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       min-height: 42px;
       padding: 8px 9px;
@@ -255,7 +264,8 @@
     }
 
     .switch-line input,
-    .check-cell input {
+    .check-cell input,
+    .mini-toggle input {
       accent-color: var(--teal);
     }
 
@@ -268,7 +278,6 @@
         minmax(64px, 0.32fr)
         minmax(86px, 0.42fr)
         minmax(104px, 0.52fr)
-        minmax(118px, 0.58fr)
         minmax(92px, 0.48fr)
         minmax(90px, 0.48fr)
         minmax(132px, 0.7fr);
@@ -314,18 +323,6 @@
     }
 
     .mini-field.is-disabled input {
-      background: #eef2f7;
-    }
-
-    .target-profit-field {
-      opacity: 0.48;
-    }
-
-    .target-mode .target-profit-field {
-      opacity: 1;
-    }
-
-    .target-profit-field input:disabled {
       background: #eef2f7;
     }
 
@@ -551,24 +548,27 @@
         <div class="board">
           <div class="tool-controls">
             <div class="field">
-              <label for="calculationMode">Modo de calculo</label>
-              <select id="calculationMode">
-                <option value="balanced" selected>Equilibrar retorno</option>
-                <option value="targets">Cobertura con total fijo</option>
-              </select>
+              <label for="surebetBudget">Apuesta total</label>
+              <div class="total-input-row">
+                <input id="surebetBudget" type="number" min="1" step="1" value="250">
+                <label class="mini-toggle" for="totalDistribute" title="Distribuir en todos los resultados">
+                  <input id="totalDistribute" type="checkbox" checked>
+                  D
+                </label>
+                <label class="mini-toggle" for="totalFixed" title="Mantener fija la apuesta total">
+                  <input id="totalFixed" type="checkbox" checked>
+                  F
+                </label>
+              </div>
             </div>
             <div class="field">
               <label for="outcomeCount">Resultados</label>
               <select id="outcomeCount">
-                <option value="2">2 resultados</option>
-                <option value="3" selected>3 resultados</option>
+                <option value="2" selected>2 resultados</option>
+                <option value="3">3 resultados</option>
                 <option value="4">4 resultados</option>
                 <option value="5">5 resultados</option>
               </select>
-            </div>
-            <div class="field">
-              <label for="surebetBudget">Apuesta total</label>
-              <input id="surebetBudget" type="number" min="1" step="1" value="200">
             </div>
             <div class="field">
               <label for="surebetCurrency">Divisa</label>
@@ -602,19 +602,18 @@
           <div class="odds-header" aria-hidden="true">
             <span>Resultado</span>
             <span>Cuota</span>
-            <span>Fija</span>
-            <span>Distribuir</span>
+            <span>F</span>
+            <span>D</span>
             <span>Stake fijo</span>
-            <span>Objetivo</span>
             <span>Comision</span>
             <span>Cambio</span>
             <span>Stake recomendado</span>
           </div>
           <div id="surebetRows"></div>
           <p class="tool-note">
-            Sin apuesta fija, la calculadora reparte la apuesta total. Con una fija activa,
-            esa cantidad define el retorno objetivo y las demas apuestas se adaptan automaticamente.
-            En cobertura, la apuesta total manda: objetivo 0 significa recuperar y un objetivo positivo prioriza beneficio.
+            Con D en todos los resultados, reparte para igualar beneficio. Si quitas D de un resultado,
+            ese resultado se cubre para recuperar y el beneficio se concentra en los resultados marcados.
+            Con F en una apuesta, esa cantidad queda bloqueada y las demas se calculan alrededor de ella.
           </p>
         </div>
 
@@ -650,11 +649,11 @@
       <div class="info-grid">
         <article class="info-panel">
           <h3>Fija</h3>
-          <p>Bloquea una unica apuesta; las demas marcadas como distribuir se recalculan para igualar su retorno.</p>
+          <p>Bloquea una apuesta concreta. Las demas cantidades se ajustan automaticamente segun las cuotas.</p>
         </article>
         <article class="info-panel">
           <h3>Distribuir</h3>
-          <p>En equilibrio cubre los resultados marcados. En cobertura, marca el resultado que quieres priorizar; los demas intentan quedar a recuperar.</p>
+          <p>Marcado en todos los resultados busca beneficio uniforme. Marcado solo en algunos concentra el beneficio ahi y cubre el resto.</p>
         </article>
         <article class="info-panel">
           <h3>Lectura del ROI</h3>
@@ -672,9 +671,10 @@
   </footer>
 
   <script>
-    const calculationMode = document.getElementById("calculationMode");
     const outcomeCount = document.getElementById("outcomeCount");
     const surebetBudget = document.getElementById("surebetBudget");
+    const totalDistribute = document.getElementById("totalDistribute");
+    const totalFixed = document.getElementById("totalFixed");
     const surebetCurrency = document.getElementById("surebetCurrency");
     const stakeRounding = document.getElementById("stakeRounding");
     const useCommissions = document.getElementById("useCommissions");
@@ -689,11 +689,11 @@
     const profitRows = document.getElementById("profitRows");
 
     const defaultRows = [
-      { label: "Real Madrid gana", odd: 3.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 30, commission: 0, rate: 1 },
-      { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
-      { label: "FC Barcelona gana", odd: 3.07, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
-      { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
-      { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", targetProfit: 0, commission: 0, rate: 1 },
+      { label: "Apuesta 1", odd: 1.20, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Apuesta 2", odd: 9.50, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Empate", odd: 4.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Resultado 4", odd: 6.50, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
+      { label: "Resultado 5", odd: 8.00, fixed: false, distribute: true, fixedStake: "", commission: 0, rate: 1 },
     ];
 
     function escapeHtml(value) {
@@ -732,7 +732,6 @@
         fixed: row.querySelector(".fixed-check").checked,
         distribute: row.querySelector(".distribute-check").checked,
         fixedStake: row.querySelector(".fixed-amount-input").value,
-        targetProfit: numberFrom(row.querySelector(".target-profit-input").value, 0),
         commission: numberFrom(row.querySelector(".commission-input").value, 0),
         rate: numberFrom(row.querySelector(".rate-input").value, 1),
       }));
@@ -758,19 +757,15 @@
           </div>
           <label class="check-cell" for="fixed-${index}">
             <input id="fixed-${index}" class="fixed-check" type="checkbox" ${row.fixed ? "checked" : ""}>
-            Fija
+            F
           </label>
           <label class="check-cell" for="distribute-${index}">
-            <input id="distribute-${index}" class="distribute-check" type="checkbox" ${row.distribute && !row.fixed ? "checked" : ""}>
-            Distribuir
+            <input id="distribute-${index}" class="distribute-check" type="checkbox" ${row.distribute ? "checked" : ""}>
+            D
           </label>
           <div class="mini-field fixed-stake">
             <label for="fixed-amount-${index}">Stake fijo</label>
             <input id="fixed-amount-${index}" class="fixed-amount-input" type="number" min="0" step="0.01" value="${escapeHtml(row.fixedStake)}" placeholder="0.00">
-          </div>
-          <div class="mini-field target-profit-field">
-            <label for="target-profit-${index}">Beneficio objetivo</label>
-            <input id="target-profit-${index}" class="target-profit-input" type="number" min="0" step="0.01" value="${row.targetProfit}">
           </div>
           <div class="mini-field" data-advanced="commission">
             <label for="commission-${index}">Comision %</label>
@@ -790,33 +785,30 @@
       updateSurebetCalculator();
     }
 
-    function normalizeFixedRows(changedCheckbox = null) {
+    function normalizeFixedRows() {
       const rows = [...surebetRows.querySelectorAll(".surebet-row")];
-      if (changedCheckbox && changedCheckbox.checked) {
-        rows.forEach((row) => {
-          const fixedCheck = row.querySelector(".fixed-check");
-          if (fixedCheck !== changedCheckbox) {
-            fixedCheck.checked = false;
-            row.querySelector(".distribute-check").disabled = false;
-          }
-        });
-      }
-
       rows.forEach((row) => {
         const fixedCheck = row.querySelector(".fixed-check");
-        const distributeCheck = row.querySelector(".distribute-check");
         const fixedAmount = row.querySelector(".fixed-amount-input");
         const fixedActive = fixedCheck.checked;
         row.classList.toggle("is-fixed", fixedActive);
         fixedAmount.disabled = !fixedActive;
-        distributeCheck.disabled = fixedActive;
-        if (fixedActive) {
-          distributeCheck.checked = false;
-          if (!fixedAmount.value) {
-            fixedAmount.value = row.querySelector("[data-stake-output]").textContent.replace(/[^0-9,.]/g, "").replace(",", ".");
-          }
+        if (fixedActive && !fixedAmount.value) {
+          fixedAmount.value = row.querySelector("[data-stake-output]").textContent.replace(/[^0-9,.]/g, "").replace(",", ".");
         }
       });
+    }
+
+    function syncTotalDistribute() {
+      const rows = [...surebetRows.querySelectorAll(".surebet-row")];
+      totalDistribute.checked = rows.length > 0 && rows.every((row) => row.querySelector(".distribute-check").checked);
+    }
+
+    function setAllDistribute(checked) {
+      surebetRows.querySelectorAll(".distribute-check").forEach((checkbox) => {
+        checkbox.checked = checked;
+      });
+      totalDistribute.checked = checked;
     }
 
     function updateAdvancedFields() {
@@ -833,18 +825,7 @@
     }
 
     function updateModeFields() {
-      const targetsOn = calculationMode.value === "targets";
-      document.body.classList.toggle("target-mode", targetsOn);
       surebetBudget.disabled = false;
-      surebetRows.querySelectorAll(".surebet-row").forEach((row) => {
-        const fixedActive = row.querySelector(".fixed-check").checked;
-        const distributeActive = row.querySelector(".distribute-check").checked;
-        const field = row.querySelector(".target-profit-field");
-        const input = row.querySelector(".target-profit-input");
-        const disabled = !targetsOn || fixedActive || !distributeActive;
-        field.classList.toggle("is-disabled", disabled);
-        input.disabled = disabled;
-      });
     }
 
     function effectiveOdd(odd, commission) {
@@ -860,8 +841,7 @@
 
     function updateSurebetCalculator() {
       const currency = surebetCurrency.value;
-      const targetsMode = calculationMode.value === "targets";
-      const targetBudget = Math.max(1, numberFrom(surebetBudget.value, 200));
+      const targetBudget = Math.max(1, numberFrom(surebetBudget.value, 250));
       const rounding = Math.max(0.01, numberFrom(stakeRounding.value, 0.01));
       const rows = readRows().map((row, index) => {
         const commission = useCommissions.checked ? row.commission : 0;
@@ -872,54 +852,92 @@
           rate,
           effectiveOdd: effectiveOdd(row.odd, commission),
           fixedStake: Math.max(0, numberFrom(row.fixedStake, 0)),
-          targetProfit: Math.max(0, numberFrom(row.targetProfit, 0)),
         };
       });
 
       const fixedRows = rows.filter((row) => row.fixed);
-      const distributedRows = rows.filter((row) => !row.fixed && row.distribute);
-      const hedgeRows = rows.filter((row) => !row.fixed);
-      const targetRows = hedgeRows.filter((row) => row.distribute && row.targetProfit > 0);
-      const fixedRow = fixedRows[0] || null;
-      const distributedInverseSum = distributedRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
+      const priorityRows = rows.filter((row) => row.fixed || row.distribute);
+      const variablePriorityRows = rows.filter((row) => !row.fixed && row.distribute);
+      const recoveryRows = rows.filter((row) => !row.fixed && !row.distribute);
       const fixedTotal = fixedRows.reduce((total, row) => total + row.fixedStake, 0);
-      const hedgeRecoveryStake = hedgeRows.reduce((total, row) => total + (targetBudget / row.effectiveOdd), 0);
-      const targetWeightInverseSum = targetRows.reduce((total, row) => total + (row.targetProfit / row.effectiveOdd), 0);
-      const targetBaseRequired = fixedTotal + hedgeRecoveryStake;
-      const targetExtraBudget = targetBudget - targetBaseRequired;
-      const targetScale = targetWeightInverseSum > 0 ? targetExtraBudget / targetWeightInverseSum : 0;
-      const hasPriorityTarget = targetRows.length > 0;
-      const balancedReturn = fixedRow
-        ? fixedRow.fixedStake * fixedRow.effectiveOdd
-        : distributedInverseSum > 0
-          ? targetBudget / distributedInverseSum
+      const allDistributed = rows.length > 0 && rows.every((row) => row.distribute);
+      const hasFixedStake = fixedRows.some((row) => row.fixedStake > 0);
+      const needsStakeDriver = !hasFixedStake && !totalFixed.checked;
+
+      let statusType = "balanced";
+      let impossibleCoverage = false;
+      let calculatedRows;
+
+      if (needsStakeDriver) {
+        statusType = "needsStakeDriver";
+        impossibleCoverage = true;
+        calculatedRows = rows.map((row) => ({
+          ...row,
+          stake: 0,
+          payout: 0,
+        }));
+      } else if (!hasFixedStake) {
+        const recoveryStakeTarget = recoveryRows.reduce((total, row) => total + (targetBudget / row.effectiveOdd), 0);
+        const fixedStakeTarget = fixedRows.reduce((total, row) => total + row.fixedStake, 0);
+        const availableForPriority = targetBudget - recoveryStakeTarget - fixedStakeTarget;
+        const priorityInverseSum = variablePriorityRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
+        const recoveryScale = recoveryStakeTarget > targetBudget && recoveryStakeTarget > 0
+          ? targetBudget / recoveryStakeTarget
+          : 1;
+        const priorityReturn = priorityInverseSum > 0 && availableForPriority > 0
+          ? availableForPriority / priorityInverseSum
           : 0;
 
-      const calculatedRows = rows.map((row) => {
-        let rawStake = 0;
-        if (targetsMode) {
+        statusType = allDistributed ? "balanced" : "coverage";
+        impossibleCoverage = recoveryScale < 1 || (priorityRows.length === 0 && recoveryRows.length > 0);
+        calculatedRows = rows.map((row) => {
+          let rawStake = 0;
           if (row.fixed) {
             rawStake = row.fixedStake;
-          } else if (hasPriorityTarget) {
-            const scaledTarget = row.distribute && row.targetProfit > 0
-              ? row.targetProfit * targetScale
-              : 0;
-            rawStake = (targetBudget + scaledTarget) / row.effectiveOdd;
+          } else if (row.distribute) {
+            rawStake = priorityReturn / row.effectiveOdd;
+          } else {
+            rawStake = (targetBudget / row.effectiveOdd) * recoveryScale;
           }
-        } else {
-          rawStake = row.fixed
-            ? row.fixedStake
-            : row.distribute
-              ? balancedReturn / row.effectiveOdd
-              : 0;
-        }
-        const stake = Math.max(0, roundTo(rawStake, rounding));
-        return {
-          ...row,
-          stake,
-          payout: stake * row.effectiveOdd,
-        };
-      });
+          const stake = Math.max(0, roundTo(rawStake, rounding));
+          return {
+            ...row,
+            stake,
+            payout: stake * row.effectiveOdd,
+          };
+        });
+      } else {
+        const fixedPriorityReturns = fixedRows
+          .filter((row) => row.fixedStake > 0)
+          .map((row) => row.fixedStake * row.effectiveOdd);
+        const referenceReturn = fixedPriorityReturns.length ? Math.min(...fixedPriorityReturns) : 0;
+        const variablePriorityStake = variablePriorityRows.reduce((total, row) => (
+          total + (referenceReturn > 0 ? referenceReturn / row.effectiveOdd : 0)
+        ), 0);
+        const recoveryInverseSum = recoveryRows.reduce((total, row) => total + (1 / row.effectiveOdd), 0);
+        const baseStake = fixedTotal + variablePriorityStake;
+        const denominator = 1 - recoveryInverseSum;
+        const solvedTotal = denominator > 0 ? baseStake / denominator : baseStake;
+
+        statusType = recoveryRows.length ? "fixedCoverage" : "fixedBalanced";
+        impossibleCoverage = denominator <= 0;
+        calculatedRows = rows.map((row) => {
+          let rawStake = 0;
+          if (row.fixed) {
+            rawStake = row.fixedStake;
+          } else if (row.distribute) {
+            rawStake = referenceReturn > 0 ? referenceReturn / row.effectiveOdd : 0;
+          } else {
+            rawStake = denominator > 0 ? solvedTotal / row.effectiveOdd : 0;
+          }
+          const stake = Math.max(0, roundTo(rawStake, rounding));
+          return {
+            ...row,
+            stake,
+            payout: stake * row.effectiveOdd,
+          };
+        });
+      }
 
       const actualStake = calculatedRows.reduce((total, row) => total + row.stake, 0);
       const profits = calculatedRows.map((row) => row.payout - actualStake);
@@ -943,31 +961,35 @@
       surebetRoiResult.textContent = formatPercent(roiValueNumber, 1);
 
       const uncoveredRows = calculatedRows.filter((row) => row.stake <= 0);
-      const balancedUncoveredRows = !targetsMode ? uncoveredRows : [];
-      const fixedWithoutStake = Boolean(fixedRow && fixedRow.fixedStake <= 0);
-      const recoveryApplied = targetsMode && hasPriorityTarget && minimumProfit >= -0.005 && !fixedWithoutStake;
-      const isPositive = targetsMode
-        ? recoveryApplied
-        : minimumProfit > 0 && balancedUncoveredRows.length === 0 && !fixedWithoutStake;
+      const fixedWithoutStake = fixedRows.some((row) => row.fixedStake <= 0);
+      const hasPriority = priorityRows.length > 0;
+      const hasPositivePriorityProfit = calculatedRows.some((row, index) => (
+        (row.distribute || row.fixed) && profits[index] > 0
+      ));
+      const recoveryRowsHold = recoveryRows.every((row) => {
+        const calculated = calculatedRows.find((item) => item.index === row.index);
+        return calculated && (calculated.payout - actualStake) >= -0.01;
+      });
+      const isPositive = statusType === "coverage" || statusType === "fixedCoverage"
+        ? hasPositivePriorityProfit && recoveryRowsHold && !impossibleCoverage && !fixedWithoutStake
+        : minimumProfit > 0 && uncoveredRows.length === 0 && !fixedWithoutStake;
       surebetStatus.classList.toggle("positive", isPositive);
       surebetStatus.classList.toggle("negative", !isPositive);
       surebetStatus.textContent = isPositive
-        ? targetsMode
-          ? targetScale >= 1
-            ? "Cobertura aplicada: el beneficio objetivo se alcanza con el total indicado."
-            : "Cobertura aplicada: se recupera el total, pero el beneficio objetivo queda reducido por las cuotas."
-          : fixedRow
+        ? statusType === "coverage" || statusType === "fixedCoverage"
+          ? "Cobertura calculada: los resultados sin D recuperan la inversion y el beneficio queda en los marcados."
+          : statusType === "fixedBalanced"
           ? "Stake fijo aplicado: el resto de apuestas se ha ajustado al mismo retorno teorico."
           : "Surebet teorica detectada con margen positivo."
-        : targetsMode && !hasPriorityTarget
-          ? "En cobertura, marca distribuir en el resultado que quieres priorizar y escribe un beneficio objetivo."
-          : targetsMode && targetScale < 0
-            ? "Con estas cuotas no hay margen para recuperar y ganar con ese total. Revisa el beneficio real de cada resultado."
-            : fixedWithoutStake
+        : !hasPriority
+          ? "Marca D en al menos un resultado para repartir beneficio o concentrarlo en esa apuesta."
+          : statusType === "needsStakeDriver"
+          ? "Activa F en la apuesta total o fija una cantidad en alguna apuesta."
+          : fixedWithoutStake
           ? "Introduce una cantidad en la apuesta fija para adaptar el resto de resultados."
-          : balancedUncoveredRows.length
-            ? "Hay resultados sin cubrir. Marca distribuir o fija un stake para todos los resultados necesarios."
-            : "No hay surebet con estos datos. Ajusta cuotas, stake o comisiones.";
+          : impossibleCoverage
+            ? "Con estas cuotas no se puede cubrir todos los resultados manteniendo esas restricciones."
+            : "No hay beneficio con estos datos. La tabla muestra el resultado real de la cobertura.";
 
       profitRows.innerHTML = calculatedRows.map((row, index) => {
         const profit = profits[index] || 0;
@@ -981,7 +1003,12 @@
     }
 
     outcomeCount.addEventListener("change", () => renderRows());
-    [calculationMode, surebetBudget, surebetCurrency, stakeRounding, useCommissions, useExchangeRates].forEach((control) => {
+    totalDistribute.addEventListener("change", () => {
+      setAllDistribute(totalDistribute.checked);
+      normalizeFixedRows();
+      updateSurebetCalculator();
+    });
+    [totalFixed, surebetBudget, surebetCurrency, stakeRounding, useCommissions, useExchangeRates].forEach((control) => {
       control.addEventListener("input", () => {
         updateModeFields();
         updateAdvancedFields();
@@ -994,23 +1021,26 @@
       });
     });
     resetCalculator.addEventListener("click", () => {
-      calculationMode.value = "balanced";
-      outcomeCount.value = "3";
-      surebetBudget.value = "200";
+      outcomeCount.value = "2";
+      surebetBudget.value = "250";
+      totalDistribute.checked = true;
+      totalFixed.checked = true;
       surebetCurrency.value = "EUR";
       stakeRounding.value = "0.01";
       useCommissions.checked = false;
       useExchangeRates.checked = false;
       renderRows(defaultRows);
     });
-    surebetRows.addEventListener("input", updateSurebetCalculator);
-    surebetRows.addEventListener("change", (event) => {
-      if (event.target.classList.contains("fixed-check")) {
-        normalizeFixedRows(event.target);
-      } else {
-        normalizeFixedRows();
-      }
+    surebetRows.addEventListener("input", () => {
+      normalizeFixedRows();
       updateModeFields();
+      syncTotalDistribute();
+      updateSurebetCalculator();
+    });
+    surebetRows.addEventListener("change", () => {
+      normalizeFixedRows();
+      updateModeFields();
+      syncTotalDistribute();
       updateSurebetCalculator();
     });
     renderRows(defaultRows);
